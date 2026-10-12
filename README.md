@@ -26,7 +26,7 @@ It downloads the country in 54 tiles and retries tiles that fail, saving only wh
 
 ## Search (cities and towns)
 
-Search only suggests cities and towns, from `api/towns.js` (which reads `api/_towns.js`). `scripts/fetch-stations.mjs` builds that list from OpenStreetMap's `place=city|town` points with their province, and gives every station a town (`t`): the town its address names, or else the nearest town center within 30 km. OpenStreetMap's town boundaries are too incomplete in the Philippines to use directly. Picking a town turns on a town filter, so the map and the Nearby list show only that town's stations (`/api/stations?town=…`) until its chip's ✕ is tapped.
+Search only suggests cities and towns, from `api/towns.js` (which reads `api/_towns.js`). It ignores accents and dots (`las pinas` finds Las Piñas), knows the usual short forms (`Sta.`, `Sto.`, `Gen.`, `QC`, `CDO`, `GenSan`), and a province name (`Laguna`) lists that province's towns. `scripts/fetch-stations.mjs` builds that list from OpenStreetMap's `place=city|town` points with their province, and gives every station a town (`t`): the town its address names, or else the nearest town center within 30 km. OpenStreetMap's town boundaries are too incomplete in the Philippines to use directly. Picking a town turns on a town filter, so the map and the Nearby list show only that town's stations (`/api/stations?town=…`) until its chip's ✕ is tapped.
 
 ## Opening hours
 
