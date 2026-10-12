@@ -1,0 +1,1379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Karga">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0f0f" media="(prefers-color-scheme: dark)">
+
+<title>Karga: Find gas stations near you</title>
+<meta name="description" content="Find gas stations near you in the Philippines, filter by brand or what's open now, compare fuel prices, and see how far each one is by road. Your data stays on your phone.">
+<!-- If the domain changes, update https://karga-han.vercel.app in the 3 tags below -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Karga">
+<meta property="og:title" content="Karga: Find gas stations near you">
+<meta property="og:description" content="Find gas stations near you in the Philippines, filter by brand or what's open now, compare fuel prices, and see how far each one is by road. Your data stays on your phone.">
+<meta property="og:url" content="https://karga-han.vercel.app/">
+<meta property="og:image" content="https://karga-han.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Karga logo with the tagline">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Karga: Find gas stations near you">
+<meta name="twitter:description" content="Find gas stations near you in the Philippines, filter by brand or what's open now, compare fuel prices, and see how far each one is by road. Your data stays on your phone.">
+<meta name="twitter:image" content="https://karga-han.vercel.app/og-image.png">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>try{var t=JSON.parse(localStorage.getItem('karga-v1')||'{}').theme;if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.31.0/mapbox-gl.css">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.31.0/mapbox-gl.js" defer></script>
+<style>
+*{box-sizing:border-box;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
+:root{--bg:#fff;--card:#f4f4f3;--card2:#fff;--ink:#000;--muted:#6b6b6b;--faint:#8f8f8f;--line:#e4e4e2;--fill:#000;--on:#fff;--track:#e0e0de;--blue-bg:#e4eefc;--blue:#2259b8;--green-bg:#e3f4e7;--green:#1b6e36;--amber-bg:#fcefd9;--amber:#7f4b00;--red-bg:#fce8e6;--red:#b42318;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0f0f;--card:#1c1c1c;--card2:#262626;--ink:#fff;--muted:#a8a8a8;--faint:#8a8a8a;--line:#2e2e2e;--fill:#fff;--on:#000;--track:#363636;--blue-bg:#17294a;--blue:#8db6f5;--green-bg:#133420;--green:#7fd49a;--amber-bg:#3a2a0c;--amber:#f2c46d;--red-bg:#3e1714;--red:#f4a39a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f0f0f;--card:#1c1c1c;--card2:#262626;--ink:#fff;--muted:#a8a8a8;--faint:#8a8a8a;--line:#2e2e2e;--fill:#fff;--on:#000;--track:#363636;--blue-bg:#17294a;--blue:#8db6f5;--green-bg:#133420;--green:#7fd49a;--amber-bg:#3a2a0c;--amber:#f2c46d;--red-bg:#3e1714;--red:#f4a39a;color-scheme:dark}
+html,body{background:var(--bg)}
+/* No double-tap-to-zoom on the app's pages and buttons (the map keeps its own zoom gestures) */
+html,body,button,input,label,a,.sheet,.nav{touch-action:manipulation}
+body{margin:0;color:var(--ink);font-family:'Onest',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.app{max-width:480px;margin:0 auto;padding:12px 16px 128px;display:flex;flex-direction:column;gap:18px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:0}
+.h2{font-size:17px;font-weight:600;margin:0}
+.t15{font-size:15px;font-weight:600}
+.sub{font-size:12.5px;color:var(--muted)}
+.tiny{font-size:11.5px;color:var(--faint)}
+.av{width:44px;height:44px;border-radius:22px;background:var(--card);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+.rb{width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rb.ghost{border:none;background:none}
+.blk{background:var(--fill);color:var(--on);border-radius:24px;padding:18px}
+.cap{font-size:12.5px;opacity:.8}
+.amt{font-size:30px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.pill{background:var(--bg);color:var(--ink);border-radius:26px;height:48px;padding:0 16px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.pill.sm{height:38px;font-size:13px}
+.card{background:var(--card);border-radius:20px;padding:16px;display:block;width:100%;text-align:left}
+.card.row{display:flex}
+.inner{background:var(--card2);border-radius:14px;padding:2px 14px}
+.li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+.li:last-child{border-bottom:none}
+.bar{height:6px;border-radius:3px;background:var(--track);overflow:hidden}
+.bar>i{display:block;height:6px;border-radius:3px;background:var(--ink)}
+.chip{font-size:12px;font-weight:500;padding:5px 11px;border-radius:14px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+.c-blue{background:var(--blue-bg);color:var(--blue)}.c-green{background:var(--green-bg);color:var(--green)}.c-amber{background:var(--amber-bg);color:var(--amber)}.c-red{background:var(--red-bg);color:var(--red)}
+.cta{background:var(--fill);color:var(--on);border-radius:16px;height:54px;width:100%;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.sec{border:1px solid var(--line);border-radius:16px;height:48px;width:100%;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card2)}
+.danger{color:var(--red)}
+.sel{border:1px solid var(--line);border-radius:18px;height:38px;padding:0 14px;font-size:13px;font-weight:500;background:var(--card2);display:inline-flex;align-items:center;gap:6px}
+.sel.on{background:var(--fill);color:var(--on);border-color:transparent}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.ico{width:42px;height:42px;border-radius:14px;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lbl{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.field{width:100%;height:50px;border-radius:14px;border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;-webkit-appearance:none;appearance:none}
+.err{font-size:13px;color:var(--red)}.err:empty{display:none}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:28px;padding:4px 4px 4px 14px;color:var(--faint)}
+.search input{flex:1;border:none;background:none;height:40px;font-size:16px;color:var(--ink);outline:none;min-width:0}
+.dot{width:22px;height:22px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.dot.on{background:var(--fill);color:var(--on)}.dot.off{background:var(--track)}
+.seg{flex:1;height:4px;background:var(--track);position:relative}
+.seg>i{position:absolute;left:0;top:0;height:4px;background:var(--ink)}
+.navwrap{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:0 16px calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none;z-index:5}
+.nav{pointer-events:auto;display:flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line);border-radius:34px;padding:6px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.nav button{height:50px;min-width:50px;border-radius:25px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--muted);padding:0 13px;font-size:13px;font-weight:600}
+.nav button.on{background:var(--fill);color:var(--on)}
+.nav button .t{display:none}.nav button.on .t{display:inline}
+.nav .div{width:1px;height:28px;background:var(--line);margin:0 4px;flex-shrink:0}
+.nav .act{width:50px;height:50px;min-width:50px;border-radius:25px;padding:0;background:var(--track);color:var(--ink)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{background:var(--bg);width:100%;max-width:480px;border-radius:26px 26px 0 0;padding:10px 16px calc(20px + env(safe-area-inset-bottom,0px));max-height:92%;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.grab{width:44px;height:4px;border-radius:2px;background:var(--track);margin:0 auto}
+.scrim.center{align-items:center;padding:16px}
+/* Pop-up: same black card as .blk (inverts in dark mode), with the white pill button used there */
+.modal{background:var(--fill);color:var(--on);width:100%;max-width:360px;border-radius:24px;padding:22px 20px 20px;display:flex;flex-direction:column;gap:14px;position:relative;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.modal .x{position:absolute;top:10px;right:10px;color:inherit}
+.modal .sub{color:inherit;opacity:.8}
+.modal .ico{background:rgba(127,127,127,.28);color:inherit}
+.modal .pill{width:100%}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--card);border-radius:16px;padding:4px}
+.tabs button{height:42px;border-radius:12px;font-weight:600;font-size:14px;color:var(--muted)}
+.tabs button.on{background:var(--card2);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(14px + env(safe-area-inset-top,0px));background:var(--fill);color:var(--on);padding:12px 18px;border-radius:24px;font-size:14px;font-weight:500;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.sw{-webkit-appearance:none;appearance:none;width:50px;height:30px;border-radius:15px;background:var(--track);position:relative;flex-shrink:0;margin:0;cursor:pointer}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:12px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.sw:checked{background:var(--fill)}.sw:checked::after{left:23px;background:var(--on)}
+.welcome{max-width:480px;margin:0 auto;min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));padding:28px 20px 32px;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.logo{width:72px;height:72px;border-radius:20px;background:var(--fill);color:var(--on);display:flex;align-items:center;justify-content:center}
+.or{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--faint)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.seg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.seg3 button{height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg3 button.on{background:var(--card2);color:var(--ink)}
+.empty{text-align:center;padding:26px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}}
+/* Karga additions, built from existing tokens */
+#mapPage{position:fixed;inset:0;display:none}
+body.on-map #mapPage{display:block}
+body.on-map #page{display:none}
+#map{position:absolute;inset:0;background:var(--card)}
+.mtop{position:absolute;left:0;right:0;top:0;max-width:480px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 0;display:flex;flex-direction:column;gap:10px;pointer-events:none;z-index:2}
+.mtop>*{pointer-events:auto}
+.mtop .row{align-items:center}
+.mchips{display:flex;gap:8px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none;padding:3px 0}
+.mchips::-webkit-scrollbar{display:none}
+.mtop .chip{align-self:flex-start;font-size:13px}
+.mapmsg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:24px}
+.mapmsg .card{max-width:400px}
+.mapboxgl-ctrl-bottom-left,.mapboxgl-ctrl-bottom-right{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}
+.aim{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);color:var(--ink);pointer-events:none;z-index:2;display:none;line-height:0}
+body.placing .aim{display:block}
+body.placing .mtop,body.placing .navwrap{display:none}
+.placebar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;z-index:6}
+.trunc{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bico{width:42px;height:42px;border-radius:21px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.bico .star{position:absolute;right:-3px;top:-3px;width:18px;height:18px;border-radius:9px;background:#f5b301;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--card2)}
+.mbtns{display:flex;gap:8px}
+.sel{white-space:nowrap;flex-shrink:0}
+.sbar{flex:1;min-width:0;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card2);display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.mtop .mchips{flex:none}
+.rb.spin svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="mapPage">
+  <div id="map"></div>
+  <div class="mtop" id="mtop"></div>
+  <div class="aim" aria-hidden="true"><svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5c-4.3 0-7.8 3.4-7.8 7.7 0 4.9 5.6 10.1 7 11.3.5.4 1.1.4 1.6 0 1.4-1.2 7-6.4 7-11.3 0-4.3-3.5-7.7-7.8-7.7zm0 3.6s-3.4 3.9-3.4 6.2a3.4 3.4 0 0 0 6.8 0c0-2.3-3.4-6.2-3.4-6.2z"/></svg></div>
+</div>
+<div id="page"></div>
+<div class="navwrap" id="navwrap" style="display:none"><nav class="nav" aria-label="Main">
+  <button data-page="map" aria-label="Map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.1 6.1 9.9 3.9a2 2 0 0 0-1.8 0L3.6 6.2A1 1 0 0 0 3 7.1v13.3a1 1 0 0 0 1.4.9l3.7-1.9a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V5.1a1 1 0 0 0-1.4-.9l-3.7 1.9a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg><span class="t">Map</span></button>
+  <button data-page="list" aria-label="Nearby"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="t">Nearby</span></button>
+  <button data-page="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg><span class="t">Settings</span></button>
+  <span class="div" aria-hidden="true"></span>
+  <button class="act" data-act="add" aria-label="Add station"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+</nav></div>
+
+<script>
+/* ===== Setup: the build (scripts/build.mjs) fills this in from MAPBOX_TOKEN in .env or Vercel ===== */
+const MAPBOX_TOKEN = 'pk.REPLACE_WITH_YOUR_MAPBOX_PUBLIC_TOKEN';
+const HAS_TOKEN = /^pk\./.test(MAPBOX_TOKEN) && !MAPBOX_TOKEN.includes('REPLACE');
+// Firebase web config (public by design; access is controlled by firestore.rules). Filled in by the build
+// from FIREBASE_* variables. When it's null, sign-in and shared prices are hidden and the app works offline-style.
+const FIREBASE_CONFIG = /*FIREBASE_CONFIG*/null;
+
+const KEY = 'karga-v1', OSM_KEY = 'karga-osm';
+const DEF = () => ({name:'', theme:'auto', dir:'google', f:[], open:false, fuel:'unleaded', sort:'near', mine:[], fav:[], tips:{}, last:null});
+// Keys match api/_norm.js. c = pin color, g = glyph color on top of it. Ordered by how common they are.
+const BRANDS = [
+  {k:'petron', n:'Petron', c:'#1f4fa8', g:'#fff'}, {k:'shell', n:'Shell', c:'#f6c000', g:'#c4161c'},
+  {k:'caltex', n:'Caltex', c:'#d52b1e', g:'#fff'}, {k:'seaoil', n:'Seaoil', c:'#00897b', g:'#fff'},
+  {k:'phoenix', n:'Phoenix', c:'#f26522', g:'#fff'}, {k:'flyingv', n:'Flying V', c:'#c2185b', g:'#fff'},
+  {k:'total', n:'TotalEnergies', c:'#3949ab', g:'#fff'}, {k:'jetti', n:'Jetti', c:'#0288d1', g:'#fff'},
+  {k:'ptt', n:'PTT', c:'#6d4c41', g:'#fff'}, {k:'unioil', n:'Unioil', c:'#8e24aa', g:'#fff'},
+  {k:'centrum', n:'Centrum', c:'#827717', g:'#fff'}, {k:'cleanfuel', n:'Cleanfuel', c:'#2b8a3e', g:'#fff'},
+  {k:'other', n:'Others', c:'#5f6368', g:'#fff'}
+];
+const brandOf = k => BRANDS.find(b => b.k === k) || BRANDS[BRANDS.length - 1];
+const FUELS = [{k:'unleaded', n:'Unleaded'}, {k:'premium', n:'Premium'}, {k:'diesel', n:'Diesel'}];
+const fuelName = k => (FUELS.find(f => f.k === k) || {n:''}).n;
+const LOGO = '<path fill-rule="evenodd" d="M12 1.5c-4.3 0-7.8 3.4-7.8 7.7 0 4.9 5.6 10.1 7 11.3.5.4 1.1.4 1.6 0 1.4-1.2 7-6.4 7-11.3 0-4.3-3.5-7.7-7.8-7.7zm0 3.6s-3.4 3.9-3.4 6.2a3.4 3.4 0 0 0 6.8 0c0-2.3-3.4-6.2-3.4-6.2z"/><rect x="7.5" y="21.3" width="9" height="2" rx="1"/>';
+const logo = s => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${LOGO}</svg>`;
+const P = {
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  locate:'<path d="M2 12h3M19 12h3M12 2v3M12 19v3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/>',
+  nav:'<path d="m3 11 19-9-9 19-2-8z"/>',
+  map:'<path d="M14.1 6.1 9.9 3.9a2 2 0 0 0-1.8 0L3.6 6.2A1 1 0 0 0 3 7.1v13.3a1 1 0 0 0 1.4.9l3.7-1.9a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V5.1a1 1 0 0 0-1.4-.9l-3.7 1.9a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/>',
+  fuel:'<path d="M3 22h12M4 9h10M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0V9.8a2 2 0 0 0-.6-1.4L18 5"/>',
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  move:'<path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  phone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  tag:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+  place:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>'
+};
+const STAR = 'M12 2.5 14.9 8.5 21.5 9.4 16.7 14 17.9 20.5 12 17.4 6.1 20.5 7.3 14 2.5 9.4 9.1 8.5Z';
+const starIco = (s, fill) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="${STAR}"/></svg>`;
+// Brand-colored round badge with a fuel pump (or the Karga drop for stations you added), plus a star when pinned.
+const bico = (s, size = 42) => { const b = brandOf(s.b); return `<span class="bico" style="width:${size}px;height:${size}px;background:${b.c};color:${b.g}">${s.mine ? logo(size*.45) : I('fuel', size*.45)}${isFav(s.id) ? `<span class="star">${starIco(10, true)}</span>` : ''}</span>`; };
+const I = (n, s=20) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]}</svg>`;
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+
+/* ===== Saved state ===== */
+let S = load();
+function load(){ try{ return Object.assign(DEF(), JSON.parse(localStorage.getItem(KEY) || '{}')); }catch(e){ return DEF(); } }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("Couldn't save. Your phone storage may be full."); } pushCloud(); }
+let F = new Set(S.f);
+const started = () => S.started || !!S.name; // S.name: people who started before the name field was removed
+
+/* ===== Theme ===== */
+function applyTheme(t){
+  const r = document.documentElement;
+  if(t === 'light' || t === 'dark') r.setAttribute('data-theme', t); else r.removeAttribute('data-theme');
+}
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => S.theme === 'dark' || (S.theme === 'auto' && darkMQ.matches);
+const styleUrl = () => isDark() ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
+const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function restyleMap(){ if(map) map.setStyle(styleUrl(), {diff:false}); }
+darkMQ.addEventListener('change', () => { if(S.theme === 'auto') restyleMap(); });
+
+/* ===== Distance ===== */
+function km(a, b){
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*rad) * Math.cos(b.lat*rad) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const fmtKm = d => d < 1 ? `${Math.max(10, Math.round(d*100)*10)} m` : d < 10 ? `${d.toFixed(1)} km` : `${Math.round(d)} km`;
+const fmtMin = s => { const m = Math.max(1, Math.round(s/60)); return m < 60 ? `${m} min` : `${Math.floor(m/60)} h ${m%60} min`; };
+
+/* ===== Location ===== */
+let pos = null, geo = 'idle', watchId = null, userMoved = false;
+function startLocate(){
+  if(!('geolocation' in navigator)){ geo = 'error'; return; }
+  if(watchId !== null) return;
+  geo = 'asking';
+  watchId = navigator.geolocation.watchPosition(p => {
+    const first = !pos;
+    pos = {lat:p.coords.latitude, lon:p.coords.longitude};
+    geo = 'ok';
+    updateMe();
+    if(first){
+      // Your first location always gets its stations, even if a fallback load around the map
+      // center already happened (slow GPS). Areas already loaded nearby aren't fetched again.
+      autoDone = false; loadArea();
+      S.last = [+pos.lat.toFixed(3), +pos.lon.toFixed(3)]; persist();
+      if(map && !userMoved && !placing) map.flyTo({center:[pos.lon, pos.lat], zoom:14});
+      if(placing && map && !placing.editId) map.easeTo({center:[pos.lon, pos.lat], zoom:17});
+      renderTop();
+      if(page !== 'map') render();
+    }
+  }, err => {
+    if(err.code === 1){ // permission denied: stop asking
+      geo = 'denied';
+      navigator.geolocation.clearWatch(watchId); watchId = null;
+    } else if(!pos) geo = 'error'; // timeout or no signal yet: keep the watch running, it may still find you
+    loadArea(); // meanwhile, load once around the map center
+    renderTop();
+    if(page !== 'map') render();
+  }, {enableHighAccuracy:true, maximumAge:15000, timeout:30000});
+}
+function locateMe(){
+  if(pos){ go('map'); if(map) map.flyTo({center:[pos.lon, pos.lat], zoom:Math.max(map.getZoom(), 14)}); return; }
+  if(geo === 'denied'){ toast('Location is blocked. Allow location for this site in your browser or phone settings, then try again.'); return; }
+  startLocate(); toast('Finding your location');
+}
+
+/* ===== Station data (OpenStreetMap) ===== */
+const OSM = new Map();
+// Stations arrive already shaped by api/_norm.js: {id, lat, lon, b, bn, name, addr, h?}.
+let cells = {}, loading = false;
+// v4 = stations that know their town (t); older saved copies are dropped and reloaded once.
+const OSM_V = 4;
+function initData(){
+  try{
+    const c = JSON.parse(localStorage.getItem(OSM_KEY) || 'null');
+    if(c && c.v === OSM_V){
+      Object.assign(cells, c.cells);
+      c.st.forEach(s => OSM.set(s.id, s));
+    }
+  }catch(e){}
+  refreshMap(); loadArea();
+  if(page === 'list') render();
+}
+function saveOsm(){ try{ localStorage.setItem(OSM_KEY, JSON.stringify({v:OSM_V, cells, st:[...OSM.values()]})); }catch(e){} }
+// Only stations near you: /api/stations returns everything within 5 km of a point.
+// Stations are kept on the phone, and each loaded point is kept in `cells` with when it loaded.
+// Loading happens once per app open (around you, or the map center if location is off)
+// and otherwise only when you tap the refresh button. Moving the map never loads.
+// A point loaded more than STALE_DAYS ago loads again, and each load replaces the stations
+// within 5 km of it, so stations removed from the server's list also leave the phone.
+const RELOAD_KM = 2, AREA_KM = 5, STALE_DAYS = 7;
+const fresh = t => Date.now() - t < STALE_DAYS * 864e5;
+// Puts `list` on the phone, dropping the stations `inArea` covers that the server no longer has.
+// Returns how many stations are new.
+function replaceStations(list, inArea){
+  const keep = new Set(list.map(s => s.id));
+  for(const s of OSM.values()) if(!keep.has(s.id) && inArea(s)) OSM.delete(s.id);
+  let added = 0;
+  list.forEach(s => { if(!OSM.has(s.id)) added++; OSM.set(s.id, s); });
+  return added;
+}
+let areaTimer, autoDone = false;
+// `at` loads around a chosen point instead (a place picked in search).
+function loadArea(force, at){
+  if(!force && autoDone) return;
+  clearTimeout(areaTimer);
+  areaTimer = setTimeout(async () => {
+    let c = at || pos;
+    if(!c){
+      if(!force && (geo === 'asking' || geo === 'idle')) return; // wait for the first location fix
+      if(!map) return;
+      const m = map.getCenter(); c = {lat:m.lat, lon:m.lng};
+    }
+    if(!force) autoDone = true;
+    if(!force && Object.entries(cells).some(([k, t]) => { const [lat, lon] = k.split(':').map(Number); return fresh(t) && km({lat, lon}, c) < RELOAD_KM; })){ setStatus(''); return; }
+    if(loading) return;
+    const lat = c.lat.toFixed(2), lon = c.lon.toFixed(2);
+    loading = true; setStatus('loading'); renderTop();
+    try{
+      // The free servers fail now and then, so try once more before showing an error.
+      let r = await fetch(`/api/stations?lat=${lat}&lon=${lon}`).catch(() => null);
+      if(!r || !r.ok){ await new Promise(ok => setTimeout(ok, 2000)); r = await fetch(`/api/stations?lat=${lat}&lon=${lon}`); }
+      if(!r.ok) throw new Error(r.status);
+      const j = await r.json(), here = {lat:+lat, lon:+lon};
+      // Just inside 5 km, so rounding never drops a station the server counted as in range.
+      const n = replaceStations(j.stations || [], s => km(here, s) < AREA_KM - 0.05);
+      for(const k in cells) if(!fresh(cells[k])) delete cells[k];
+      cells[lat+':'+lon] = Date.now();
+      saveOsm(); setStatus(''); refreshMap();
+      const where = at ? 'here' : 'near you';
+      if(force) toast(n > 0 ? `Found ${n} more station${n === 1 ? '' : 's'} ${where}` : `Stations ${where} are up to date`);
+      if(page === 'list') render();
+    }catch(err){ setStatus('error'); }
+    finally{ loading = false; renderTop(); }
+  }, force ? 0 : 500);
+}
+function refreshHere(){
+  if(!pos && geo !== 'denied') startLocate();
+  if(pos && map) map.flyTo({center:[pos.lon, pos.lat], zoom:Math.max(map.getZoom(), 14)});
+  loadArea(true);
+}
+let status = '';
+function setStatus(k){ status = k; const el = $('mstatus'); if(el) el.innerHTML = statusHTML(); }
+function statusHTML(){
+  if(status === 'loading') return '<span class="chip c-blue">Loading stations…</span>';
+  if(status === 'zoom') return '<span class="chip c-blue">Zoom in to see stations</span>';
+  if(status === 'error') return '<button class="chip c-red" data-act="retry">Couldn\'t load stations. Tap to try again</button>';
+  if(!pos && geo === 'denied') return '<button class="chip c-amber" data-act="locate">Location is off. Showing stations around the map</button>';
+  if(!pos && geo === 'error') return '<button class="chip c-amber" data-act="locate">Still finding your location…</button>';
+  return '';
+}
+const brandName = k => (BRANDS.find(b => b.k === k) || {n:'Other'}).n;
+const mineToSt = m => ({id:m.id, lat:m.lat, lon:m.lon, b:m.brand, bn:m.brand === 'other' ? 'Other brand' : brandName(m.brand), name:m.name || (m.brand === 'other' ? 'Gas station' : brandName(m.brand)), addr:'', note:m.note, mine:true});
+// Pinned stations keep a copy of their details, so they still show if OpenStreetMap drops them.
+const isFav = id => S.fav.some(f => f.id === id);
+// An admin-approved new name/brand (decisions/<id> with name and b) replaces OpenStreetMap's, and
+// remembers the old name in `was`. Used wherever stations are listed or looked up.
+const ov = s => {
+  const d = s && !s.mine && PR.dec.get(s.id);
+  if(!d || !d.name) return s;
+  const b = d.b || s.b;
+  return {...s, name:d.name, b, bn:b === 'other' ? d.name : brandName(b), was:s.name !== d.name ? s.name : s.was};
+};
+const allStations = () => [...OSM.values(), ...S.fav.filter(f => !f.mine && !OSM.has(f.id)), ...S.mine.map(mineToSt)].map(ov);
+const passes = s => (!F.size || F.has(s.b)) && (!S.open || hoursOf(s).open === true);
+
+/* ===== Opening hours ===== */
+// Reads the common OpenStreetMap opening_hours forms: "24/7", "Mo-Sa 06:00-22:00; Su 07:00-20:00",
+// "06:00-22:00", "Mo-Fr 06:00-12:00,13:00-21:00", "Su off". Anything else (holidays, months, sunrise…)
+// is shown as written and treated as unknown. Later rules override earlier ones for their days, as in OSM.
+const DAYS = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
+const hoursCache = new Map();
+function parseHours(h){
+  if(!h) return null;
+  if(/^\s*24\/7\s*$/.test(h)) return {always:true};
+  const week = Array.from({length:7}, () => null);
+  for(const rule of h.split(';').map(r => r.trim()).filter(Boolean)){
+    if(/^(PH|SH)\b/i.test(rule)) continue; // public/school holiday rules: ignored
+    const m = rule.match(/^(?:([A-Za-z]{2}(?:\s*[-,]\s*[A-Za-z]{2})*)\s+)?(off|closed|[\d:,\-+\s]+)$/i);
+    if(!m) return null;
+    let days = [0, 1, 2, 3, 4, 5, 6];
+    if(m[1]){
+      days = [];
+      for(const part of m[1].toLowerCase().split(',').map(x => x.trim())){
+        const [a, b] = part.split('-').map(x => DAYS.indexOf(x.trim()));
+        if(a < 0 || (b !== undefined && b < 0)) return null;
+        if(b === undefined) days.push(a); else for(let d = a; ; d = (d + 1) % 7){ days.push(d); if(d === b) break; }
+      }
+    }
+    let spans = [];
+    if(!/^(off|closed)$/i.test(m[2])){
+      for(const t of m[2].split(',').map(x => x.trim()).filter(Boolean)){
+        const tm = t.match(/^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})\+?$/) || t.match(/^(\d{1,2}):(\d{2})\+$/);
+        if(!tm) return null;
+        const start = +tm[1]*60 + +tm[2];
+        let end = tm[3] != null ? +tm[3]*60 + +tm[4] : 1440;
+        if(end <= start) end += 1440; // runs past midnight
+        spans.push([start, end]);
+      }
+    }
+    days.forEach(d => week[d] = spans);
+  }
+  if(week.every(s => s && s.some(([a, b]) => a === 0 && b >= 1440))) return {always:true};
+  return {week};
+}
+const fmtTime = mins => { const m = ((mins % 1440) + 1440) % 1440, h = Math.floor(m/60), mm = m % 60; return `${h % 12 || 12}${mm ? ':' + String(mm).padStart(2, '0') : ''} ${h < 12 ? 'AM' : 'PM'}`; };
+// → {open: true/false/null (unknown), text, always}
+function hoursOf(s, now = new Date()){
+  if(!s.h) return {open:null, text:''};
+  let p = hoursCache.get(s.h);
+  if(p === undefined){ p = parseHours(s.h); hoursCache.set(s.h, p); }
+  if(!p) return {open:null, text:s.h};
+  if(p.always) return {open:true, always:true, text:'Open 24 hours'};
+  const d = (now.getDay() + 6) % 7, t = now.getHours()*60 + now.getMinutes();
+  const today = p.week[d] || [], yest = p.week[(d + 6) % 7] || [];
+  const cur = today.find(([a, b]) => a <= t && t < b) || yest.filter(([, b]) => b > 1440).map(([a, b]) => [a - 1440, b - 1440]).find(([, b]) => t < b);
+  if(cur) return {open:true, text:`Open · closes ${fmtTime(cur[1])}`};
+  const later = today.filter(([a]) => a > t).sort((x, y) => x[0] - y[0])[0];
+  if(later) return {open:false, text:`Closed · opens ${fmtTime(later[0])}`};
+  for(let i = 1; i <= 7; i++){
+    const n = (p.week[(d + i) % 7] || []).slice().sort((x, y) => x[0] - y[0])[0];
+    if(n) return {open:false, text:`Closed · opens ${i === 1 ? 'tomorrow' : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][(d + i) % 7]} ${fmtTime(n[0])}`};
+  }
+  return {open:false, text:'Closed'};
+}
+const find = id => { const m = S.mine.find(x => x.id === id); return m ? mineToSt(m) : ov(OSM.get(id) || S.fav.find(f => f.id === id)); };
+function toggleFav(id){
+  const s = find(id); if(!s) return;
+  if(isFav(id)){ S.fav = S.fav.filter(f => f.id !== id); toast('Removed from pinned'); }
+  else { const {id:i, lat, lon, b, bn, name, addr, h, mine} = s; S.fav.push({id:i, lat, lon, b, bn, name, addr, h, mine:!!mine}); toast('Pinned'); }
+  persist(); refreshMap();
+  const btn = $('favbtn'); if(btn) btn.outerHTML = favBtn(id);
+  if(page === 'list') render();
+}
+const favBtn = id => `<button class="rb" id="favbtn" data-fav="${esc(id)}" aria-pressed="${isFav(id)}" aria-label="${isFav(id) ? 'Unpin station' : 'Pin station'}" style="${isFav(id) ? 'color:#f5b301' : ''}">${starIco(20, isFav(id))}</button>`;
+
+/* ===== Map ===== */
+let map = null, mapStarted = false, selId = null, handlersOn = false;
+const fc = list => ({type:'FeatureCollection', features:list.map(s => ({type:'Feature', geometry:{type:'Point', coordinates:[s.lon, s.lat]}, properties:{id:s.id, mine:!!s.mine, b:s.b || 'other', fav:isFav(s.id), closed:isClosed(s)}}))});
+// Pinned stations always show on the map, even when a brand filter would hide them.
+// With a town picked in search, only that town's stations show (plus pinned ones).
+const mapStations = () => allStations().filter(s => (passes(s) && (!TOWN || s.t === TOWN.id)) || isFav(s.id));
+function mapMsg(t, d){ return `<div class="mapmsg"><div class="card empty"><div class="ico">${I('map')}</div><div class="t15">${t}</div><div class="sub">${d}</div></div></div>`; }
+function initMap(){
+  const el = $('map');
+  if(!HAS_TOKEN){ el.innerHTML = mapMsg('Add your Mapbox token', 'Open index.html and replace MAPBOX_TOKEN with your public token. It starts with pk.'); return; }
+  if(!window.mapboxgl){ el.innerHTML = mapMsg("The map couldn't load", 'Check your internet connection, then open Karga again.'); return; }
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  const c = pos ? [pos.lon, pos.lat] : S.last ? [S.last[1], S.last[0]] : [120.9842, 14.5995];
+  map = new mapboxgl.Map({container:el, style:styleUrl(), center:c, zoom:(pos || S.last) ? 13.5 : 11.5, attributionControl:false, dragRotate:false, pitchWithRotate:false});
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new mapboxgl.AttributionControl({compact:true}), 'bottom-right');
+  map.on('style.load', setupLayers);
+  map.on('dragstart', () => userMoved = true);
+  map.on('error', e => { if(e && e.error && e.error.status === 401) toast('Mapbox did not accept the token. Check it in index.html.'); });
+}
+// Teardrop pin in the brand color with a fuel pump (or the Karga drop for your own stations),
+// and a gold star badge when pinned. Drawn at 2x; the tip of the pin sits on the station.
+const PIN_W = 60, PIN_H = 68;
+function pinImage(brand, mine, fav, bg){
+  const b = brandOf(brand), c = document.createElement('canvas'); c.width = PIN_W; c.height = PIN_H;
+  const x = c.getContext('2d'), s = 2.5;
+  x.save(); x.translate(30 - 12*s, 66 - 22*s); x.scale(s, s);
+  const shape = new Path2D('M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z');
+  x.shadowColor = 'rgba(0,0,0,.28)'; x.shadowBlur = 4; x.shadowOffsetY = 1;
+  x.fillStyle = b.c; x.fill(shape); x.shadowColor = 'transparent';
+  x.lineWidth = 1.2; x.strokeStyle = bg; x.stroke(shape);
+  x.translate(12, 10); x.scale(.44, .44); x.translate(-12, -12);
+  if(mine){ x.fillStyle = b.g; x.fill(new Path2D('M12 3.5c-3.6 0-6.4 2.8-6.4 6.3 0 4 4.6 8.3 5.7 9.3.4.3.9.3 1.3 0 1.1-1 5.8-5.3 5.8-9.3 0-3.5-2.9-6.3-6.4-6.3z')); }
+  else { x.strokeStyle = b.g; x.lineWidth = 2.6; x.lineCap = x.lineJoin = 'round'; x.stroke(new Path2D(P.fuel.match(/d="([^"]+)"/)[1])); }
+  x.restore();
+  if(fav){
+    x.beginPath(); x.arc(45, 20, 12, 0, Math.PI*2); x.fillStyle = '#f5b301'; x.fill(); x.lineWidth = 3; x.strokeStyle = bg; x.stroke();
+    x.save(); x.translate(45, 20); x.scale(.65, .65); x.translate(-12, -11.5); x.fillStyle = '#fff'; x.fill(new Path2D(STAR)); x.restore();
+  }
+  return x.getImageData(0, 0, PIN_W, PIN_H);
+}
+const pinName = ['concat', ['case', ['get', 'mine'], 'mine-', 'pin-'], ['get', 'b'], ['case', ['get', 'fav'], '-fav', '']];
+function setupLayers(){
+  const ink = cssVar('--fill'), on = cssVar('--on'), bg = cssVar('--bg');
+  BRANDS.forEach(b => [false, true].forEach(mine => [false, true].forEach(fav => {
+    const k = `${mine ? 'mine' : 'pin'}-${b.k}${fav ? '-fav' : ''}`;
+    if(map.hasImage(k)) map.removeImage(k);
+    map.addImage(k, pinImage(b.k, mine, fav, bg), {pixelRatio:2});
+  })));
+  map.addSource('st', {type:'geojson', data:fc(mapStations()), cluster:true, clusterRadius:42, clusterMaxZoom:12});
+  map.addSource('sel', {type:'geojson', data:fc([])});
+  map.addSource('me', {type:'geojson', data:fc([])});
+  map.addLayer({id:'sel-ring', type:'circle', source:'sel', paint:{'circle-radius':20, 'circle-translate':[0, -16], 'circle-color':'rgba(0,0,0,0)', 'circle-stroke-width':3, 'circle-stroke-color':ink}});
+  map.addLayer({id:'st-cl', type:'circle', source:'st', filter:['has', 'point_count'], paint:{'circle-color':ink, 'circle-radius':['step', ['get', 'point_count'], 17, 10, 20, 50, 24], 'circle-stroke-width':2, 'circle-stroke-color':bg}});
+  map.addLayer({id:'st-cl-n', type:'symbol', source:'st', filter:['has', 'point_count'], layout:{'text-field':['get', 'point_count_abbreviated'], 'text-font':['DIN Pro Medium', 'Arial Unicode MS Bold'], 'text-size':13, 'text-allow-overlap':true}, paint:{'text-color':on}});
+  map.addLayer({id:'st-pt', type:'symbol', source:'st', filter:['!', ['has', 'point_count']], layout:{'icon-image':pinName, 'icon-anchor':'bottom', 'icon-allow-overlap':true, 'icon-ignore-placement':true, 'symbol-sort-key':['case', ['get', 'fav'], 2, ['get', 'mine'], 1, 0]}, paint:{'icon-opacity':['case', ['get', 'closed'], 0.35, 1]}});
+  map.addLayer({id:'me-halo', type:'circle', source:'me', paint:{'circle-radius':18, 'circle-color':ink, 'circle-opacity':.12}});
+  map.addLayer({id:'me-dot', type:'circle', source:'me', paint:{'circle-radius':7, 'circle-color':ink, 'circle-stroke-width':3, 'circle-stroke-color':bg}});
+  updateMe(); setSel();
+  if(!handlersOn){
+    handlersOn = true;
+    map.on('click', 'st-pt', e => { if(!placing) openStation(e.features[0].properties.id); });
+    map.on('click', 'st-cl', e => {
+      if(placing) return;
+      const f = e.features[0], src = map.getSource('st');
+      const done = z => map.easeTo({center:f.geometry.coordinates, zoom:z});
+      const r = src.getClusterExpansionZoom(f.properties.cluster_id, (err, z) => { if(!err) done(z); });
+      if(r && r.then) r.then(done).catch(() => {});
+    });
+    ['st-pt', 'st-cl'].forEach(l => {
+      map.on('mouseenter', l, () => map.getCanvas().style.cursor = 'pointer');
+      map.on('mouseleave', l, () => map.getCanvas().style.cursor = '');
+    });
+  }
+  loadArea();
+}
+function refreshMap(){ if(map && map.getSource('st')) map.getSource('st').setData(fc(mapStations())); }
+function updateMe(){ if(map && map.getSource('me')) map.getSource('me').setData(fc(pos ? [{id:'me', ...pos}] : [])); }
+function setSel(){ if(map && map.getSource('sel')){ const s = selId && find(selId); map.getSource('sel').setData(fc(s ? [s] : [])); } }
+function focusStation(s){
+  if(!map) return;
+  map.easeTo({center:[s.lon, s.lat], zoom:Math.max(map.getZoom(), 15), padding:{top:0, bottom:Math.round(innerHeight*.45), left:0, right:0}});
+}
+
+/* ===== Sheets and toast ===== */
+let sheetClose = null;
+function openSheet(html, onClose){
+  closeSheet();
+  const s = document.createElement('div');
+  s.className = 'scrim'; s.id = 'scrim';
+  s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
+  s.addEventListener('click', e => { if(e.target === s || e.target.closest('[data-close]')) closeSheet(); });
+  document.body.appendChild(s);
+  sheetClose = onClose || null;
+}
+// A centered pop-up for short messages; closes with its ✕, a [data-close] button, or a tap outside.
+function openModal(html, onClose){
+  closeSheet();
+  const s = document.createElement('div');
+  s.className = 'scrim center'; s.id = 'scrim';
+  s.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><button class="rb ghost x" data-close aria-label="Close">${I('x')}</button>${html}</div>`;
+  s.addEventListener('click', e => { if(e.target === s || e.target.closest('[data-close]')) closeSheet(); });
+  document.body.appendChild(s);
+  sheetClose = onClose || null;
+}
+function closeSheet(){
+  const s = $('scrim'); if(!s) return;
+  s.remove();
+  const f = sheetClose; sheetClose = null; if(f) f();
+}
+const sheetHead = t => `<div class="grab"></div><div class="row"><h2 class="h2">${t}</h2><button class="rb ghost" data-close aria-label="Close">${I('x')}</button></div>`;
+let toastT;
+function toast(msg){
+  document.querySelector('.toast')?.remove(); clearTimeout(toastT);
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg;
+  document.body.appendChild(t); toastT = setTimeout(() => t.remove(), 3000);
+}
+function confirmSheet(title, text, label, danger, ok){
+  openSheet(`${sheetHead(title)}<p class="sub" style="font-size:15px;margin:0">${text}</p>
+    <button class="${danger ? 'sec danger' : 'cta'}" id="cOk">${label}</button>
+    ${danger ? '' : '<button class="sec" data-close>Cancel</button>'}`);
+  $('cOk').onclick = () => { closeSheet(); ok(); };
+}
+
+/* ===== Account (Google sign-in through Firebase, optional) ===== */
+// Signing in is only needed to share fuel prices. It also keeps pinned and added stations
+// in Firestore (users/{uid}) so they follow you to other devices. Everything else works signed out.
+const FB_URL = 'https://www.gstatic.com/firebasejs/10.14.1';
+const AU = {user:null, admin:false, auth:null, fs:null, a:null, db:null, after:null};
+let fbReady = Promise.resolve(false);
+function initFirebase(){
+  if(!FIREBASE_CONFIG){ PR.on = false; return; }
+  fbReady = (async () => {
+    try{
+      const [app, auth, fs] = await Promise.all(['firebase-app', 'firebase-auth', 'firebase-firestore'].map(m => import(`${FB_URL}/${m}.js`)));
+      const a = app.initializeApp(FIREBASE_CONFIG);
+      Object.assign(AU, {auth, fs, a:auth.getAuth(a), db:fs.initializeFirestore(a, {ignoreUndefinedProperties:true})});
+      auth.getRedirectResult(AU.a).catch(signInError);
+      auth.onAuthStateChanged(AU.a, async u => {
+        const was = AU.user; AU.user = u;
+        AU.admin = false; REV.list = null;
+        if(u){ try{ AU.admin = (await fs.getDoc(fs.doc(AU.db, 'admins', u.uid))).exists(); }catch(e){} }
+        if(u && !was) await pullCloud();
+        if(u && AU.after){ const {id, then} = AU.after; AU.after = null; go('map'); setTimeout(() => then === 'price' ? openPriceForm(id) : openStation(id), 80); return; }
+        if(page !== 'map') render();
+      });
+      PR.on = true;
+      loadDecisions();
+      return true;
+    }catch(e){ console.warn('Firebase did not load', e); PR.on = false; if(page !== 'map') render(); return false; }
+  })();
+}
+const GOOGLE_G = '<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+async function signIn(){
+  if(!(await fbReady) || !AU.auth){ toast(FIREBASE_CONFIG ? "Sign-in couldn't load. Check your connection." : "Sign-in isn't set up yet."); return; }
+  const p = new AU.auth.GoogleAuthProvider();
+  try{ await AU.auth.signInWithPopup(AU.a, p); toast('Signed in'); }
+  catch(e){
+    // Some phones (and home-screen apps) block pop-ups; fall back to a full-page redirect.
+    if(['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment', 'auth/web-storage-unsupported'].includes(e.code)) return AU.auth.signInWithRedirect(AU.a, p);
+    signInError(e);
+  }
+}
+function signInError(e){ if(!e || ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'].includes(e.code)) return; console.warn(e); toast("Couldn't sign in. Try again."); }
+async function signOut(){ if(AU.auth) await AU.auth.signOut(AU.a); toast('Signed out'); render(); }
+// Asks a signed-out person to sign in with a pop-up. "Go to Settings" opens the Google sign-in card;
+// once they're in, the app comes back to what they were doing (`then`: 'price' form or the station 'card').
+function needSignIn(stationId, then = 'price'){
+  AU.after = stationId ? {id:stationId, then} : null;
+  const what = then === 'price' ? 'share fuel prices' : 'report a closed station or a new name';
+  openModal(`<div class="ico">${logo(22)}</div>
+    <div><h2 class="h2">Sign in first</h2>
+    <p class="sub" style="font-size:14px;margin:6px 0 0">To ${what}, sign in with your Google account. Go to <b>Settings</b> and tap <b>Sign in with Google</b>. It only takes a moment, and we'll bring you right back here.</p></div>
+    <button class="pill" data-act="goto-signin">${I('nav', 18)}Go to Settings</button>`, () => { AU.after = null; });
+}
+function gotoSignIn(){
+  const after = AU.after; closeSheet(); AU.after = after; // closing with ✕ forgets it; this button keeps it
+  go('settings');
+  setTimeout(() => { const a = $('account'); if(a){ a.scrollIntoView({behavior:'smooth', block:'center'}); a.style.outline = '2px solid var(--blue)'; setTimeout(() => a.style.outline = '', 2000); } }, 50);
+}
+// Cloud copy of pinned and added stations. On sign-in the phone's and the account's lists are merged.
+let pushT;
+async function pullCloud(){
+  try{
+    const snap = await AU.fs.getDoc(AU.fs.doc(AU.db, 'users', AU.user.uid));
+    const c = snap.exists() ? snap.data() : {};
+    const merge = (cloud = [], local = []) => { const m = new Map(cloud.map(x => [x.id, x])); local.forEach(x => m.set(x.id, x)); return [...m.values()]; };
+    S.fav = merge(c.fav, S.fav); S.mine = merge(c.mine, S.mine);
+    persist(); refreshMap();
+  }catch(e){ console.warn('Could not load your saved stations', e); }
+}
+function pushCloud(){
+  if(!AU.user) return;
+  clearTimeout(pushT);
+  pushT = setTimeout(() => AU.fs.setDoc(AU.fs.doc(AU.db, 'users', AU.user.uid), {fav:S.fav, mine:S.mine, updated:AU.fs.serverTimestamp()})
+    .catch(e => console.warn('Could not sync your stations', e)), 1200);
+}
+async function eraseCloud(){
+  if(!AU.user) return;
+  const {fs, db} = AU, uid = AU.user.uid;
+  const [mine, st, ch] = await Promise.all(['reports', 'status', 'changes'].map(c => fs.getDocs(fs.query(fs.collection(db, c), fs.where('uid', '==', uid)))));
+  await Promise.all([...mine.docs, ...st.docs, ...ch.docs].map(d => fs.deleteDoc(d.ref)).concat(fs.deleteDoc(fs.doc(db, 'users', uid))));
+  await AU.auth.signOut(AU.a);
+}
+function accountHTML(){
+  if(!FIREBASE_CONFIG || PR.on === false && !AU.user) return '';
+  const u = AU.user;
+  if(!u) return `<div class="card" id="account" style="display:flex;flex-direction:column;gap:12px">
+    <div><div class="t15">Sign in to share fuel prices</div><div class="sub" style="margin-top:3px;font-size:13.5px">Your pinned and added stations will also be saved to your Google account, so they're on all your devices.</div></div>
+    <button class="sec" data-act="signin" style="background:var(--card2)">${GOOGLE_G}Sign in with Google</button>
+  </div>`;
+  const nm = u.displayName || u.email || 'Signed in';
+  return `<div class="card row" id="account">
+    <div style="display:flex;gap:14px;align-items:center;min-width:0">
+      ${u.photoURL ? `<img src="${esc(u.photoURL)}" alt="" width="44" height="44" referrerpolicy="no-referrer" style="border-radius:22px;flex-shrink:0">` : `<div class="av" style="background:var(--fill);color:var(--on)">${esc(nm.charAt(0).toUpperCase())}</div>`}
+      <div style="min-width:0"><div class="trunc" style="font-size:16px;font-weight:600">${esc(nm)}</div>${u.email ? `<div class="sub trunc">${esc(u.email)}</div>` : ''}</div>
+    </div>
+    <button class="pill sm" style="background:var(--card2);border:1px solid var(--line);flex-shrink:0" data-act="signout">Sign out</button>
+  </div>`;
+}
+
+/* ===== Fuel prices (Firestore "reports", one per person per station per fuel) ===== */
+// A station's price for a fuel is the middle value (median) of up to 5 recent reports from different
+// people, so one wrong report can't move it much. Reports older than 30 days are ignored.
+// PR.on: null = still loading, false = no Firebase, true = working.
+const PR = {on:null, map:new Map(), got:new Map(), st:new Map(), dec:new Map()};
+const sharedId = id => /^[nwr]\d+$/.test(id); // stations people add stay private, so they have no shared prices
+const priceShown = () => PR.on !== false && S.fuel !== 'off';
+const peso = p => `₱${p.toFixed(2)}`;
+const MAX_AGE = 30 * 864e5;
+function ago(t){
+  const m = Math.round((Date.now() - t) / 60000);
+  if(m < 60) return m < 2 ? 'just now' : `${m} min ago`;
+  const h = Math.round(m / 60); if(h < 24) return `${h} hour${h === 1 ? '' : 's'} ago`;
+  const d = Math.round(h / 24); return `${d} day${d === 1 ? '' : 's'} ago`;
+}
+function summarize(reports){
+  const out = {};
+  for(const f of FUELS){
+    const rs = reports.filter(r => r.f === f.k && Date.now() - r.at < MAX_AGE).sort((a, b) => b.at - a.at).slice(0, 5);
+    if(!rs.length) continue;
+    const ps = rs.map(r => r.p).sort((a, b) => a - b), mid = ps.length >> 1;
+    out[f.k] = {p:ps.length % 2 ? ps[mid] : (ps[mid - 1] + ps[mid]) / 2, at:rs[0].at, n:rs.length, mine:AU.user ? rs.find(r => r.uid === AU.user.uid) : null};
+  }
+  return out;
+}
+// Closed stations. People can report a station closed ("status", one per person per station); those are
+// only reports for review. A station is closed only when an admin decides so ("decisions/<stationId>").
+// Admins are listed by hand in Firestore (admins/<uid>) and get a review list in Settings.
+const ST_AGE = 90 * 864e5;
+const statusOf = s => PR.st.get(s.id) || null;              // {closed: count, mine: 'closed'|null}
+const decisionOf = s => PR.dec.get(s.id) || null;           // {closed: bool, name, b, at}
+const isClosed = s => decisionOf(s)?.closed === true;
+// Fetches prices, closed reports and admin decisions for stations not checked in the last 5 minutes.
+// Resolves true when something changed.
+async function loadPrices(ids){
+  if(PR.on === false || !(await fbReady)) return false;
+  const now = Date.now(), need = [...new Set(ids)].filter(id => sharedId(id) && !(now - (PR.got.get(id) || 0) < 3e5)).slice(0, 60);
+  if(!need.length) return false;
+  need.forEach(id => PR.got.set(id, now));
+  try{
+    const {fs, db} = AU, byId = new Map(need.map(id => [id, []])), sts = new Map(need.map(id => [id, {closed:0, mine:null}]));
+    const decs = new Map();
+    for(let i = 0; i < need.length; i += 30){ // Firestore "in" takes up to 30 values
+      const part = need.slice(i, i + 30);
+      // Each part fails on its own (e.g. rules not published yet), so prices still load without the others.
+      const soft = q => fs.getDocs(q).catch(e => { console.warn('Firestore read failed', e.code); return null; });
+      const [rep, st, dec] = await Promise.all([
+        S.fuel === 'off' ? null : fs.getDocs(fs.query(fs.collection(db, 'reports'), fs.where('s', 'in', part))),
+        soft(fs.query(fs.collection(db, 'status'), fs.where('s', 'in', part))),
+        soft(fs.query(fs.collection(db, 'decisions'), fs.where(fs.documentId(), 'in', part)))
+      ]);
+      rep?.forEach(d => { const r = d.data(); if(r.at) byId.get(r.s)?.push({...r, at:r.at.toMillis()}); });
+      st?.forEach(d => {
+        const r = d.data(), v = sts.get(r.s); if(!v || r.v !== 'closed' || !r.at || now - r.at.toMillis() > ST_AGE) return;
+        v.closed++;
+        if(AU.user && r.uid === AU.user.uid) v.mine = 'closed';
+      });
+      dec?.forEach(d => decs.set(d.id, decRow(d.data())));
+    }
+    if(S.fuel !== 'off') byId.forEach((rs, id) => PR.map.set(id, summarize(rs)));
+    sts.forEach((v, id) => PR.st.set(id, v));
+    need.forEach(id => decs.has(id) ? PR.dec.set(id, decs.get(id)) : PR.dec.delete(id));
+    refreshMap();
+    return true;
+  }catch(e){ console.warn('Could not load prices', e); need.forEach(id => PR.got.delete(id)); return false; }
+}
+const decRow = r => ({closed:!!r.closed, name:r.name || '', b:r.b || '', at:r.at ? r.at.toMillis() : 0});
+// All admin decisions are few, so they're loaded once when the app opens: renamed stations then show
+// their new name and brand color on the map right away.
+async function loadDecisions(){
+  try{
+    const snap = await AU.fs.getDocs(AU.fs.collection(AU.db, 'decisions'));
+    snap.forEach(d => PR.dec.set(d.id, decRow(d.data())));
+    refreshMap(); if(page === 'list') render();
+  }catch(e){ console.warn('Could not load station decisions', e.code); }
+}
+async function sendStatus(id, v){
+  if(!AU.user) return needSignIn(id, 'card');
+  const {fs, db} = AU, uid = AU.user.uid, ref = fs.doc(db, 'status', `${id}_${uid}`);
+  try{
+    if(v) await fs.setDoc(ref, {s:id, v, at:fs.serverTimestamp(), uid}); else await fs.deleteDoc(ref);
+  }catch(e){ console.warn(e); toast(e.code === 'permission-denied' ? 'You just did that. Wait a minute and try again.' : "Couldn't save. Check your connection and try again."); return; }
+  toast(v === 'closed' ? "Thanks! We'll review it" : 'Your report was removed');
+  PR.got.delete(id); await loadPrices([id]);
+  if(selId === id) openStation(id);
+  if(page === 'list') render();
+}
+// Admin only. `patch` changes the station's decision ({closed}, {name, b}); the rest is kept.
+// An empty patch just marks the current reports as reviewed.
+async function decide(id, patch, msg){
+  if(!AU.admin) return;
+  const {fs, db} = AU, cur = PR.dec.get(id) || {closed:false, name:'', b:''};
+  const next = {closed:cur.closed, ...(cur.name ? {name:cur.name, b:cur.b} : {}), ...patch};
+  if(!next.name){ delete next.name; delete next.b; }
+  try{ await fs.setDoc(fs.doc(db, 'decisions', id), {...next, at:fs.serverTimestamp(), by:AU.user.uid}); }
+  catch(e){ console.warn(e); toast("Couldn't save. Check the admins record and rules in Firebase."); return; }
+  PR.dec.set(id, {closed:!!next.closed, name:next.name || '', b:next.b || '', at:Date.now()});
+  toast(msg || 'Saved');
+  PR.got.delete(id); await loadPrices([id]);
+  REV.list = REV.list && REV.list.filter(x => x.id !== id);
+  refreshMap();
+  if(selId === id) openStation(id);
+  if(page !== 'map') render();
+}
+// Name/brand change: people suggest it ("changes", reviewed by an admin); admins save it directly.
+function openRenameForm(id){
+  const s = find(id); if(!s) return;
+  if(!AU.user) return needSignIn(id, 'card');
+  let brand = s.b;
+  openSheet(`${sheetHead(AU.admin ? 'Change name or brand' : 'Reopened with a new name?')}
+    <p class="sub" style="margin:0;font-size:14px">${AU.admin ? 'Everyone will see the new name and brand right away.' : `If ${esc(s.name)} closed and reopened as a different station, tell us its new brand and name. We'll review it before changing it.`}</p>
+    <div><span class="lbl">New brand</span><div class="chips" id="rb">${BRANDS.map(b => `<button class="sel${brand === b.k ? ' on' : ''}" data-b="${b.k}" aria-pressed="${brand === b.k}">${b.k === 'other' ? 'Other' : b.n}</button>`).join('')}</div></div>
+    <div><label class="lbl" for="rn">New name</label><input class="field" id="rn" maxlength="60" placeholder="e.g. Seaoil Sison" value="${esc(s.name)}"></div>
+    <div class="err" id="rerr"></div>
+    <button class="cta" id="rsave">${AU.admin ? 'Save' : 'Send for review'}</button>`);
+  $('rb').onclick = e => {
+    const b = e.target.closest('[data-b]'); if(!b) return;
+    brand = b.dataset.b;
+    $('rb').querySelectorAll('.sel').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+  };
+  $('rsave').onclick = async () => {
+    const name = $('rn').value.trim().replace(/\s+/g, ' ');
+    if(!name){ $('rerr').textContent = 'Enter the new name'; return; }
+    if(name === s.name && brand === s.b){ $('rerr').textContent = 'Change the name or brand first'; return; }
+    if(AU.admin){ closeSheet(); return decide(id, {closed:false, name, b:brand}, 'Name and brand updated'); }
+    $('rsave').disabled = true;
+    try{
+      const {fs, db} = AU, uid = AU.user.uid;
+      await fs.setDoc(fs.doc(db, 'changes', `${id}_${uid}`), {s:id, name, b:brand, at:fs.serverTimestamp(), uid});
+      closeSheet(); toast("Thanks! We'll review it"); openStation(id);
+    }catch(e){
+      console.warn(e); $('rsave').disabled = false;
+      $('rerr').textContent = e.code === 'permission-denied' ? 'You just sent one. Wait a minute and try again.' : "Couldn't send. Check your connection and try again.";
+    }
+  };
+}
+function closedHTML(s){
+  if(!sharedId(s.id) || PR.on === false) return '';
+  const v = statusOf(s), dec = decisionOf(s), closed = isClosed(s), n = v ? v.closed : 0;
+  let line;
+  if(closed) line = 'Marked closed after review.';
+  else if(v && v.mine) line = `You reported this closed. It will be reviewed${n > 1 ? ` (${n} reports so far)` : ''}.`;
+  else if(n && !(dec && dec.at >= Date.now() - ST_AGE)) line = `${n} ${n === 1 ? 'person' : 'people'} reported this closed. Waiting for review.`;
+  else line = 'Closed for good, or reopened as a different station?';
+  const pill = (attr, label, cls = '') => `<button class="pill sm${cls}" style="background:var(--card2);border:1px solid var(--line)" ${attr}>${label}</button>`;
+  const btns = [];
+  if(!closed) btns.push(v && v.mine ? pill(`data-status="${esc(s.id)}|"`, 'Undo my report') : pill(`data-status="${esc(s.id)}|closed"`, 'Report closed', ' danger'));
+  btns.push(pill(`data-rename="${esc(s.id)}"`, AU.admin ? 'Admin: change name or brand' : closed ? 'Reopened with a new name' : 'New name or brand'));
+  if(AU.admin) btns.push(closed ? pill(`data-decide="${esc(s.id)}|open"`, 'Admin: mark open') : pill(`data-decide="${esc(s.id)}|closed"`, 'Admin: mark closed', ' danger'));
+  return `<div class="card" style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+    <div class="sub" style="font-size:13.5px">${esc(line)}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${btns.join('')}</div></div>`;
+}
+// Admin review list: stations with closed reports or name/brand suggestions newer than their last decision.
+const REV = {list:null, loading:false};
+async function loadReview(){
+  if(!AU.admin || REV.loading) return;
+  REV.loading = true;
+  try{
+    const {fs, db} = AU, now = Date.now();
+    const soft = q => fs.getDocs(q).catch(e => { console.warn('Review read failed', e.code); return null; });
+    const [st, ch, dec] = await Promise.all([
+      soft(fs.query(fs.collection(db, 'status'), fs.where('v', '==', 'closed'))),
+      soft(fs.collection(db, 'changes')),
+      soft(fs.collection(db, 'decisions'))
+    ]);
+    const decAt = new Map((dec ? dec.docs : []).map(d => [d.id, d.data().at ? d.data().at.toMillis() : 0]));
+    const by = new Map(), row = id => by.get(id) || (by.set(id, {id, n:0, last:0, sug:[]}), by.get(id));
+    const fresh = r => { const at = r.at ? r.at.toMillis() : 0; return now - at <= ST_AGE && at > (decAt.get(r.s) || 0) ? at : 0; };
+    st?.forEach(d => { const r = d.data(), at = fresh(r); if(!at) return; const x = row(r.s); x.n++; x.last = Math.max(x.last, at); });
+    ch?.forEach(d => {
+      const r = d.data(), at = fresh(r); if(!at) return;
+      const x = row(r.s), same = x.sug.find(g => g.name.toLowerCase() === r.name.toLowerCase() && g.b === r.b);
+      if(same) same.n++; else x.sug.push({name:r.name, b:r.b, n:1});
+      x.last = Math.max(x.last, at);
+    });
+    const list = [...by.values()].sort((a, b) => (b.n + b.sug.length) - (a.n + a.sug.length) || b.last - a.last);
+    const missing = list.filter(x => !find(x.id)).map(x => x.id);
+    if(missing.length){
+      const j = await fetch(`/api/stations?ids=${missing.slice(0, 100).join(',')}`).then(r => r.json()).catch(() => ({stations:[]}));
+      (j.stations || []).forEach(s => { if(!OSM.has(s.id)) OSM.set(s.id, s); });
+    }
+    REV.list = list;
+  }catch(e){ console.warn('Could not load reports to review', e); REV.list = []; }
+  finally{ REV.loading = false; }
+  if(page === 'settings') render();
+}
+function reviewHTML(){
+  if(!AU.admin) return '';
+  if(REV.list === null){ setTimeout(loadReview); return `<div class="card" style="padding:12px"><div class="sub" style="padding:4px;font-size:14px">Loading reports to review…</div></div>`; }
+  const btn = (attr, label, cls = '') => `<button class="pill sm${cls}" style="background:var(--card);border:1px solid var(--line)" ${attr}>${label}</button>`;
+  const rows = REV.list.map(x => {
+    const s = find(x.id) || {id:x.id, name:'Station ' + x.id, bn:'', addr:'', b:'other'};
+    const what = [x.n ? `${x.n} closed report${x.n === 1 ? '' : 's'}` : '', x.sug.length ? `${x.sug.length} new name suggestion${x.sug.length === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
+    return `<div class="li" style="flex-direction:column;align-items:stretch;gap:8px">
+      <button style="display:flex;gap:12px;align-items:center;min-width:0;text-align:left" data-show="${esc(s.id)}">${bico(s, 36)}
+        <span style="min-width:0"><span class="trunc" style="font-weight:600">${esc(s.name)}</span><span class="sub trunc">${what} · ${ago(x.last)}${s.addr ? ' · ' + esc(s.addr) : ''}</span></span></button>
+      <span style="display:flex;gap:6px;flex-wrap:wrap">
+        ${x.sug.map(g => btn(`data-approve="${esc(s.id)}|${esc(g.b)}|${esc(g.name)}"`, `Rename to “${esc(g.name)}” (${esc(g.b === 'other' ? 'Other' : brandName(g.b))})${g.n > 1 ? ` ×${g.n}` : ''}`)).join('')}
+        ${x.n && !isClosed(s) ? btn(`data-decide="${esc(s.id)}|closed"`, 'Mark closed', ' danger') : ''}
+        ${btn(`data-decide="${esc(s.id)}|dismiss"`, 'Dismiss')}</span></div>`;
+  }).join('');
+  return `<div class="card" style="padding:12px">
+    <div class="row" style="padding:2px 4px 10px"><span class="sub" style="font-size:14px">Admin · Reports to review (${REV.list.length})</span>
+      <button class="rb ghost" style="width:32px;height:32px" data-act="review-refresh" aria-label="Reload reports">${I('refresh', 16)}</button></div>
+    ${REV.list.length ? `<div class="inner">${rows}</div>` : '<p class="sub" style="margin:4px">Nothing to review right now.</p>'}
+    <p class="tiny" style="margin:10px 4px 2px">Rename changes the station's name and brand for everyone and marks it open. Mark closed fades it on the map and moves it to the end of lists. Dismiss keeps things as they are and clears these reports.</p>
+  </div>`;
+}
+const priceOf = (s, fuel = S.fuel) => { const v = (PR.map.get(s.id) || {})[fuel]; return v ? v.p : null; };
+function pricesHTML(s){
+  if(!sharedId(s.id) || !priceShown()) return '';
+  const got = PR.map.get(s.id);
+  return `<div class="card" style="padding:12px" id="prices">
+    <div class="row" style="padding:2px 4px 10px"><span class="sub" style="display:flex;gap:8px;align-items:center;font-size:14px">${I('tag', 18)}Fuel prices</span>
+      <button class="pill sm" style="background:var(--card2);border:1px solid var(--line)" data-price="${esc(s.id)}">${I('edit', 15)}Update</button></div>
+    <div class="inner">${FUELS.map(f => { const v = got && got[f.k]; return `<div class="li"><span>${f.n}</span>
+      <span style="display:flex;gap:10px;align-items:center;text-align:right">${v ? `<span><span style="font-weight:600">${peso(v.p)}</span><span class="tiny" style="display:block">${v.n} report${v.n === 1 ? '' : 's'} · ${ago(v.at)}</span></span>
+        ${v.mine && Math.abs(v.mine.p - v.p) < .005 && Date.now() - v.mine.at < 864e5 ? '' : `<button class="chip c-green" data-confirm="${esc(s.id)}|${f.k}" aria-label="${f.n} price is still correct">Still correct</button>`}`
+      : `<span class="sub">${got ? 'No price yet' : 'Loading…'}</span>`}</span></div>`; }).join('')}</div>
+    <p class="tiny" style="margin:10px 4px 2px">Shared by Karga users, showing the middle of recent reports. Prices change often, so check at the pump.</p>
+  </div>`;
+}
+async function sendReport(id, fuel, p){
+  const {fs, db} = AU, uid = AU.user.uid;
+  await fs.setDoc(fs.doc(db, 'reports', `${id}_${fuel}_${uid}`), {s:id, f:fuel, p:Math.round(p * 100) / 100, at:fs.serverTimestamp(), uid});
+}
+async function confirmPrice(v){
+  const [id, fuel] = v.split('|'), cur = (PR.map.get(id) || {})[fuel];
+  if(!AU.user) return needSignIn(id);
+  if(!cur) return;
+  try{ await sendReport(id, fuel, cur.p); toast(`Thanks! ${fuelName(fuel)} price confirmed`); }
+  catch(e){ console.warn(e); toast("Couldn't save. Wait a minute and try again."); return; }
+  PR.got.delete(id); await loadPrices([id]);
+  const el = $('prices'), s = find(id); if(selId === id && el && s) el.outerHTML = pricesHTML(s);
+}
+function openPriceForm(id){
+  const s = find(id); if(!s) return;
+  if(!AU.user) return needSignIn(id);
+  const got = PR.map.get(id) || {};
+  openSheet(`${sheetHead('Update fuel prices')}
+    <p class="sub" style="margin:0;font-size:14px">${esc(s.name)}. Enter the prices you saw today, per liter. Leave a fuel blank to skip it.</p>
+    ${FUELS.map(f => `<div><label class="lbl" for="pf-${f.k}">${f.n}</label><input class="field" id="pf-${f.k}" type="number" inputmode="decimal" step="0.01" min="30" max="150" placeholder="${got[f.k] ? got[f.k].p.toFixed(2) : 'e.g. 62.50'}"></div>`).join('')}
+    <div class="err" id="pferr"></div>
+    <button class="cta" id="pfsave">Share prices</button>`);
+  $('pfsave').onclick = async () => {
+    const todo = FUELS.map(f => ({fuel:f.k, price:$('pf-' + f.k).value.trim()})).filter(x => x.price !== '');
+    if(!todo.length){ $('pferr').textContent = 'Enter at least one price'; return; }
+    if(todo.some(x => !(+x.price >= 30 && +x.price <= 150))){ $('pferr').textContent = 'Prices should be between ₱30 and ₱150 per liter'; return; }
+    $('pfsave').disabled = true; $('pfsave').textContent = 'Sharing…';
+    try{
+      for(const x of todo) await sendReport(id, x.fuel, +x.price);
+      PR.got.delete(id); await loadPrices([id]);
+      closeSheet(); toast('Thanks! Prices shared'); openStation(id);
+      if(page === 'list') render();
+    }catch(e){
+      console.warn(e);
+      $('pferr').textContent = e.code === 'permission-denied' ? 'You just shared a price here. Wait a minute and try again.' : "Couldn't share prices. Check your connection and try again.";
+      $('pfsave').disabled = false; $('pfsave').textContent = 'Share prices';
+    }
+  };
+}
+
+/* ===== Station sheet ===== */
+// Road distances from Mapbox, per station: {o: where you were, m: meters (null = no route), t: seconds}.
+// A result is reused until you're 300 m from where it was measured, and kept on the phone between visits.
+const ROAD_KEY = 'karga-road';
+const road = new Map((() => { try{ return JSON.parse(localStorage.getItem(ROAD_KEY) || '[]'); }catch(e){ return []; } })());
+function saveRoads(){ try{ localStorage.setItem(ROAD_KEY, JSON.stringify([...road].slice(-600))); }catch(e){} }
+const roadOf = s => { const r = pos && road.get(s.id); return r && km(r.o, pos) < 0.3 ? r : null; };
+const roadTxt = r => r.m == null ? 'No road route' : fmtKm(r.m/1000);
+let matrixBusy = false;
+async function loadRoads(list){
+  const need = list.filter(s => !roadOf(s)).slice(0, 24);
+  if(!need.length || matrixBusy || !HAS_TOKEN || !pos) return;
+  matrixBusy = true;
+  const o = {...pos}, pts = [o, ...need].map(p => `${p.lon},${p.lat}`).join(';');
+  try{
+    const r = await fetch(`https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${pts}?sources=0&annotations=distance,duration&access_token=${MAPBOX_TOKEN}`);
+    if(!r.ok) throw new Error(r.status);
+    const j = await r.json();
+    need.forEach((s, i) => { road.delete(s.id); road.set(s.id, {o, m:j.distances[0][i+1], t:j.durations[0][i+1]}); });
+    saveRoads();
+    if(page === 'list') render();
+  }catch(e){}
+  finally{ matrixBusy = false; }
+}
+function dirUrl(s){
+  if(S.dir === 'waze') return `https://waze.com/ul?ll=${s.lat},${s.lon}&navigate=yes`;
+  if(S.dir === 'apple') return `https://maps.apple.com/?daddr=${s.lat},${s.lon}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lon}`;
+}
+function openStation(id){
+  const s = find(id); if(!s) return;
+  selId = id; setSel(); focusStation(s);
+  const d = pos ? km(pos, s) : null, rd = roadOf(s), hr = hoursOf(s);
+  const sub = [s.name !== s.bn ? s.bn : '', s.was ? `Formerly ${s.was}` : ''].filter(Boolean).join(' · ');
+  openSheet(`<div class="grab"></div>
+    <div class="row" style="align-items:center">
+      <div style="display:flex;gap:12px;align-items:center;min-width:0">${bico(s, 44)}
+        <div style="min-width:0"><h2 class="h2">${esc(s.name)}</h2>${sub ? `<div class="sub" style="margin-top:2px">${esc(sub)}</div>` : ''}</div></div>
+      <div class="mbtns">${favBtn(id)}<button class="rb ghost" data-close aria-label="Close">${I('x')}</button></div>
+    </div>
+    ${isClosed(s) ? `<div><span class="chip c-red">${I('x', 14)}Closed</span></div>`
+      : hr.open != null ? `<div><span class="chip ${hr.open ? 'c-green' : 'c-red'}">${I('clock', 14)}${esc(hr.text)}</span></div>` : ''}
+    <section class="blk">
+      <div class="row" style="align-items:flex-start">
+        <div style="min-width:0">
+          <div class="cap">${HAS_TOKEN ? 'Distance by road' : 'Straight-line distance'}</div>
+          <div class="amt" id="road-km">${d == null ? 'Unknown' : !HAS_TOKEN ? fmtKm(d) : rd ? roadTxt(rd) : '…'}</div>
+          <div class="cap" id="road" style="margin-top:4px">${d == null ? 'Turn on location to see how far it is' : !HAS_TOKEN ? 'Road distance needs a Mapbox token' : rd && rd.m != null ? `About ${fmtMin(rd.t)} drive` : 'Checking the road…'}</div>
+        </div>
+        <button class="pill sm" data-dir="${esc(id)}">${I('nav', 16)}Directions</button>
+      </div>
+      ${d == null ? `<div style="margin-top:18px"><button class="pill" style="width:100%" data-act="locate">${I('locate', 18)}Use my location</button></div>` : ''}
+    </section>
+    ${pricesHTML(s)}
+    <div class="card" style="padding:12px">
+      <div class="sub" style="padding:4px 4px 10px;font-size:14px">Station details</div>
+      <div class="inner">
+        <div class="li"><span class="sub">Brand</span><span style="font-weight:600">${esc(s.bn)}</span></div>
+        ${s.addr ? `<div class="li"><span class="sub">Address</span><span style="font-weight:600;text-align:right">${esc(s.addr)}</span></div>` : ''}
+        <div class="li"><span class="sub">Hours</span><span style="font-weight:600;text-align:right">${s.h ? esc(hr.always ? 'Open 24 hours' : s.h) : '<span class="sub">Not listed</span>'}</span></div>
+        ${s.note ? `<div class="li"><span class="sub">Note</span><span style="font-weight:600;text-align:right">${esc(s.note)}</span></div>` : ''}
+        <div class="li"><span class="sub">Source</span><span style="font-weight:600">${s.mine ? 'Added by you' : 'OpenStreetMap'}</span></div>
+      </div>
+    </div>
+    <div id="status">${closedHTML(s)}</div>
+    ${s.mine ? `<div class="g2"><button class="sec" data-edit="${esc(id)}">${I('edit', 18)}Edit</button><button class="sec danger" data-del="${esc(id)}">${I('trash', 18)}Delete</button></div>` : ''}`,
+    () => { selId = null; setSel(); });
+  if(d != null && HAS_TOKEN && !rd) roadFor(s);
+  if(sharedId(id) && PR.on !== false){
+    const before = isClosed(s);
+    PR.got.delete(id); // always fetch fresh prices and reports when a station is opened
+    loadPrices([id]).then(() => {
+      if(selId !== id) return;
+      if(isClosed(s) !== before) return openStation(id); // the closed badge changed: redraw the card
+      const el = $('prices'); if(el) el.outerHTML = pricesHTML(s);
+      const st = $('status'); if(st) st.innerHTML = closedHTML(s);
+    });
+  }
+}
+async function roadFor(s){
+  const o = {...pos};
+  try{
+    const r = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${o.lon},${o.lat};${s.lon},${s.lat}?overview=false&access_token=${MAPBOX_TOKEN}`);
+    if(!r.ok) throw new Error(r.status);
+    const j = await r.json(), rt = j.routes && j.routes[0];
+    road.delete(s.id); road.set(s.id, {o, m:rt ? rt.distance : null, t:rt ? rt.duration : null}); saveRoads();
+  }catch(e){
+    if(selId === s.id && $('road')){ $('road-km').textContent = fmtKm(km(o, s)); $('road').textContent = "Couldn't check the road. This is the straight-line distance."; }
+    return;
+  }
+  const rd = road.get(s.id);
+  if(selId === s.id && $('road')){ $('road-km').textContent = roadTxt(rd); $('road').textContent = rd.m != null ? `About ${fmtMin(rd.t)} drive` : ''; }
+}
+
+/* ===== Add or edit a station ===== */
+let placing = null;
+function startPlace(editId){
+  if(!HAS_TOKEN || !map){ go('map'); toast('Add your Mapbox token first to place stations on the map.'); return; }
+  closeSheet();
+  if(page !== 'map') go('map');
+  placing = {editId:editId || null};
+  document.body.classList.add('placing');
+  const m = editId && S.mine.find(x => x.id === editId);
+  if(m) map.jumpTo({center:[m.lon, m.lat], zoom:Math.max(map.getZoom(), 17)});
+  else if(pos) map.easeTo({center:[pos.lon, pos.lat], zoom:Math.max(map.getZoom(), 17)});
+  else startLocate();
+  const bar = document.createElement('div');
+  bar.className = 'placebar'; bar.id = 'placebar';
+  bar.innerHTML = `<div class="sheet">
+    <div><h2 class="h2">Place the pin</h2><p class="sub" style="font-size:14px;margin:4px 0 0">Move the map until the pin sits on the station.</p></div>
+    <button class="cta" data-act="place-ok">Use this spot</button>
+    <button class="sec" data-act="place-cancel">Cancel</button></div>`;
+  document.body.appendChild(bar);
+}
+function endPlace(){ placing = null; document.body.classList.remove('placing'); $('placebar')?.remove(); }
+function openForm(o){
+  const m = o.editId ? S.mine.find(x => x.id === o.editId) : null;
+  let brand = m ? m.brand : (F.size === 1 ? [...F][0] : '');
+  openSheet(`${sheetHead(m ? 'Edit station' : 'New station')}
+    <div><span class="lbl">Brand</span><div class="chips" id="fb">${BRANDS.map(b => `<button class="sel${brand === b.k ? ' on' : ''}" data-b="${b.k}" aria-pressed="${brand === b.k}">${b.k === 'other' ? 'Other' : b.n}</button>`).join('')}</div></div>
+    <div><label class="lbl" for="fn">Station name (optional)</label><input class="field" id="fn" maxlength="60" placeholder="Petron MacArthur Highway" value="${esc(m ? m.name : '')}"></div>
+    <div><label class="lbl" for="fo">Note (optional)</label><input class="field" id="fo" maxlength="80" placeholder="Open 24 hours, has free air" value="${esc(m ? m.note : '')}"></div>
+    ${m ? `<button class="sec" id="fmove">${I('move', 18)}Move pin</button>` : ''}
+    <div class="err" id="ferr"></div>
+    <button class="cta" id="fsave">Save station</button>`);
+  $('fb').onclick = e => {
+    const b = e.target.closest('[data-b]'); if(!b) return;
+    brand = b.dataset.b;
+    $('fb').querySelectorAll('.sel').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+    $('ferr').textContent = '';
+  };
+  if(m) $('fmove').onclick = () => startPlace(m.id);
+  $('fsave').onclick = () => {
+    if(!brand){ $('ferr').textContent = 'Choose a brand'; return; }
+    const name = $('fn').value.trim(), note = $('fo').value.trim();
+    let id;
+    if(m){ Object.assign(m, {brand, name, note}); if(o.lat != null){ m.lat = +o.lat.toFixed(6); m.lon = +o.lon.toFixed(6); } id = m.id; }
+    else { id = 'm' + Date.now().toString(36); S.mine.push({id, lat:+o.lat.toFixed(6), lon:+o.lon.toFixed(6), brand, name, note, added:new Date().toISOString()}); }
+    if(F.size && !F.has(brand)){ F.add(brand); S.f = [...F]; renderTop(); }
+    persist(); refreshMap(); closeSheet(); toast('Station saved');
+  };
+}
+
+/* ===== Search (cities and towns only) ===== */
+// Suggestions come from /api/towns (every city and town in the Philippines, with its province).
+// Picking one turns on a town filter: the map and the Nearby list show only that town's stations
+// (each station knows its town, `t`), until the filter chip's ✕ is tapped.
+let searchT, searchN = 0, TOWN = null;
+function openSearch(){
+  openSheet(`${sheetHead('Find a city or town')}
+    <div class="search">${I('search', 18)}<input id="sq" type="search" enterkeyhint="search" placeholder="City or town, e.g. Sison" autocomplete="off" maxlength="60"></div>
+    <div id="sres"><p class="sub" style="margin:0;text-align:center;padding:12px 0">Pick a city or town to see all its gas stations, for example before a trip.</p></div>`);
+  const q = $('sq'); q.focus();
+  q.oninput = () => { clearTimeout(searchT); searchT = setTimeout(() => runSearch(q.value.trim()), 300); };
+}
+async function runSearch(q){
+  const out = $('sres'); if(!out) return;
+  if(q.length < 2){ out.innerHTML = ''; return; }
+  const n = ++searchN;
+  const near = pos ? `&lat=${pos.lat.toFixed(3)}&lon=${pos.lon.toFixed(3)}` : '';
+  const j = await fetch(`/api/towns?q=${encodeURIComponent(q)}${near}`).then(r => r.ok ? r.json() : {towns:[]}).catch(() => null);
+  if(n !== searchN || !$('sres')) return; // a newer search started
+  if(!j){ out.innerHTML = '<p class="sub" style="margin:0;text-align:center;padding:12px 0">Search needs internet. Try again.</p>'; return; }
+  const rows = (j.towns || []).map(t => `<button class="li" style="width:100%;text-align:left" data-town="${esc(t.id)}" data-tname="${esc(t.n)}" data-tprov="${esc(t.p)}" data-tll="${t.lon},${t.lat}">
+      <span style="display:flex;gap:12px;align-items:center;min-width:0"><span class="ico" style="background:var(--card)">${I('place', 18)}</span>
+        <span style="min-width:0"><span class="trunc" style="font-weight:600">${esc(t.n)}</span><span class="sub trunc">${esc([t.k === 'city' ? 'City' : 'Town', t.p].filter(Boolean).join(' · '))}</span></span></span>
+      <span class="sub" style="flex-shrink:0">${t.c} station${t.c === 1 ? '' : 's'}</span></button>`).join('');
+  out.innerHTML = rows ? `<div class="card" style="padding:12px"><div class="inner">${rows}</div></div>` : '<p class="sub" style="margin:0;text-align:center;padding:12px 0">No city or town by that name.</p>';
+}
+async function pickTown(ds){
+  const [lon, lat] = ds.tll.split(',').map(Number);
+  TOWN = {id:ds.town, n:ds.tname, p:ds.tprov, lat, lon};
+  closeSheet(); go('map'); userMoved = true;
+  setStatus('loading'); renderTop();
+  try{
+    const r = await fetch(`/api/stations?town=${encodeURIComponent(TOWN.id)}`);
+    if(!r.ok) throw new Error(r.status);
+    const list = (await r.json()).stations || [];
+    replaceStations(list, s => s.t === TOWN.id);
+    saveOsm(); setStatus(''); refreshMap(); renderTop();
+    const pts = list.length ? list : [TOWN];
+    const lons = pts.map(p => p.lon), lats = pts.map(p => p.lat);
+    if(map) map.fitBounds([[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]], {padding:{top:150, bottom:120, left:40, right:40}, maxZoom:14, duration:900});
+    toast(list.length ? `${list.length} station${list.length === 1 ? '' : 's'} in ${TOWN.n}` : `No stations listed in ${TOWN.n} yet`);
+  }catch(e){ setStatus('error'); }
+}
+function clearTown(){ TOWN = null; refreshMap(); renderTop(); if(page === 'list') render(); }
+const townChip = () => TOWN ? `<button class="chip c-blue" data-act="town-clear" aria-label="Show all stations again">${I('place', 14)}${esc(TOWN.n)}${TOWN.p ? ', ' + esc(TOWN.p) : ''} ${I('x', 14)}</button>` : '';
+
+/* ===== Pages ===== */
+let page = 'map';
+function go(p){ if(placing && p !== 'map') endPlace(); page = p; closeSheet(); render(); scrollTo(0, 0); }
+function chipsHTML(){
+  return `<button class="sel${S.open ? ' on' : ''}" data-act="open-toggle" aria-pressed="${S.open}">${I('clock', 15)}Open now</button>` +
+    `<button class="sel${F.size ? '' : ' on'}" data-f="all" aria-pressed="${!F.size}">All</button>` +
+    BRANDS.map(b => `<button class="sel${F.has(b.k) ? ' on' : ''}" data-f="${b.k}" aria-pressed="${F.has(b.k)}">${b.n}</button>`).join('');
+}
+function renderTop(){
+  const t = $('mtop'); if(!t) return;
+  t.innerHTML = `<div class="row"><button class="sbar" data-act="search">${I('search', 18)}Search a city or town</button>
+    <div class="mbtns"><button class="rb${loading ? ' spin' : ''}" data-act="refresh" aria-label="Load stations near me">${I('refresh')}</button>
+    <button class="rb" data-act="locate" aria-label="Show my location">${I('locate')}</button></div></div>
+    <div class="mchips" role="group" aria-label="Filters">${chipsHTML()}</div>
+    ${TOWN ? `<div>${townChip()}</div>` : ''}
+    <div id="mstatus">${statusHTML()}</div>`;
+}
+function render(){
+  const root = $('page'), welcome = !started();
+  $('navwrap').style.display = welcome ? 'none' : '';
+  document.body.classList.toggle('on-map', !welcome && page === 'map');
+  if(welcome){ root.innerHTML = welcomeHTML(); return; }
+  document.querySelectorAll('.nav [data-page]').forEach(b => { const on = b.dataset.page === page; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
+  if(page === 'map'){
+    root.innerHTML = '';
+    renderTop();
+    if(!mapStarted){ mapStarted = true; initMap(); } else if(map) map.resize();
+    return;
+  }
+  root.innerHTML = `<main class="app">${page === 'list' ? listHTML() : settingsHTML()}</main>`;
+}
+function welcomeHTML(){
+  return `<main class="welcome">
+    <div class="logo">${logo(40)}</div>
+    <div>
+      <h1 class="h1" style="font-size:32px;font-weight:700;margin-bottom:8px">Karga</h1>
+      <p class="sub" style="font-size:16px;margin:0;max-width:30ch">Find gas stations near you, compare fuel prices, and see how far each one is by road.</p>
+    </div>
+    <button class="cta" data-act="start">Get started</button>
+    <p class="tiny" style="text-align:center;margin:0">No account needed.${FIREBASE_CONFIG ? ' Sign in with Google anytime in Settings to share fuel prices.' : ''}</p>
+  </main>`;
+}
+function getStarted(){ S.started = true; persist(); page = 'map'; render(); startLocate(); }
+function emptyHTML(icon, title, text, btn, act){
+  return `<div class="card empty"><div class="ico">${I(icon)}</div><div class="t15">${title}</div><div class="sub">${text}</div>
+    <button class="cta" style="height:44px;width:auto;padding:0 20px;font-size:14px" data-act="${act}">${btn}</button></div>`;
+}
+function listHTML(){
+  const head = `<header class="row">
+      <div style="min-width:0"><h1 class="h1 trunc">${TOWN ? esc(TOWN.n) : 'Nearby'}</h1><div class="sub trunc" style="margin-top:2px">${TOWN ? esc([TOWN.p, pos ? 'distances from you' : ''].filter(Boolean).join(' · ')) : pos ? 'Closest stations to you' : geo === 'asking' ? 'Finding your location…' : 'Location is off'}</div></div>
+      <div class="mbtns"><button class="rb" data-act="search" aria-label="Search">${I('search')}</button>
+      <button class="rb" data-act="locate" aria-label="Show my location">${I('locate')}</button></div>
+    </header>
+    <div class="mchips" style="flex:none" role="group" aria-label="Filters">${chipsHTML()}</div>
+    ${TOWN ? `<div>${townChip()}</div>` : ''}
+    ${priceShown() && (pos || TOWN) ? `<div class="tabs" role="radiogroup" aria-label="Sort stations">
+      <button role="radio" aria-checked="${S.sort !== 'cheap'}" class="${S.sort !== 'cheap' ? 'on' : ''}" data-sort="near">Nearest</button>
+      <button role="radio" aria-checked="${S.sort === 'cheap'}" class="${S.sort === 'cheap' ? 'on' : ''}" data-sort="cheap">Cheapest ${fuelName(S.fuel).toLowerCase()}</button></div>` : ''}`;
+  const line = s => [s.name !== s.bn ? s.bn : '', s.addr, s.mine ? 'Added by you' : ''].filter(Boolean).join(', ');
+  const priceLine = s => { if(!priceShown() || !sharedId(s.id)) return ''; const p = priceOf(s); return `<span class="sub" style="font-variant-numeric:tabular-nums">${p != null ? `${fuelName(S.fuel)} ${peso(p)}` : PR.map.has(s.id) ? 'No price yet' : ''}</span>`; };
+  const rowHTML = (x, dist) => { const {s} = x, hr = hoursOf(s); return `<button class="li" style="width:100%;text-align:left" data-show="${esc(s.id)}">
+        <span style="display:flex;gap:12px;align-items:center;min-width:0">${bico(s)}
+          <span style="min-width:0"><span class="trunc" style="font-weight:600">${esc(s.name)}</span>${line(s) ? `<span class="sub trunc">${esc(line(s))}</span>` : ''}${isClosed(s) ? `<span class="sub trunc" style="color:var(--red)">Closed</span>` : hr.open != null ? `<span class="sub trunc" style="color:var(${hr.open ? '--green' : '--red'})">${esc(hr.text)}</span>` : ''}</span>
+        </span>
+        <span style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0"><span style="font-weight:600;font-variant-numeric:tabular-nums">${dist(x)}</span>${priceLine(s)}</span></button>`; };
+  const favs = S.fav.map(f => find(f.id) || f);
+  const pinnedHTML = dist => favs.length && !TOWN ? `<div class="card" style="padding:12px">
+      <div class="sub" style="display:flex;gap:6px;align-items:center;padding:4px 4px 10px;font-size:14px"><span style="color:#f5b301;display:flex">${starIco(16, true)}</span>Pinned</div>
+      <div class="inner">${favs.map(s => ({s, d:pos ? km(pos, s) : null})).sort((a, b) => (a.d ?? 0) - (b.d ?? 0)).map(x => rowHTML(x, dist)).join('')}</div>
+    </div>` : '';
+  if(!pos && !TOWN) return head + pinnedHTML(() => '') + emptyHTML('pin', 'Location is off', 'Turn on location to sort stations by distance.', 'Use my location', 'locate');
+  // Take the 24 closest in a straight line (within 40 km, or anywhere in the picked town),
+  // then rank them by road distance once Mapbox answers.
+  const near = allStations().filter(s => passes(s) && (!TOWN || s.t === TOWN.id)).map(s => ({s, d:pos ? km(pos, s) : 0}))
+    .filter(x => TOWN || x.d <= 40).sort((a, b) => a.d - b.d).slice(0, 24);
+  setTimeout(() => {
+    if(pos) loadRoads([...(TOWN ? [] : favs.filter(s => km(pos, s) <= 40)), ...near.map(x => x.s)]);
+    loadPrices([...favs, ...near.map(x => x.s)].map(s => s.id)).then(ch => { if(ch && page === 'list') render(); });
+  });
+  const rk = x => { const r = roadOf(x.s); return r ? (r.m == null ? Infinity : r.m/1000) : x.d * 1.4; };
+  // Cheapest: stations with a price first (lowest first, closer wins a tie), then the rest by distance.
+  const cheap = priceShown() && S.sort === 'cheap';
+  const pk = x => { const p = priceOf(x.s); return p == null ? Infinity : p; };
+  // Stations reported closed always go last.
+  const arr = near.sort((a, b) => (isClosed(a.s) - isClosed(b.s)) || (cheap ? (pk(a) - pk(b)) || (rk(a) - rk(b)) : rk(a) - rk(b)));
+  const dist = x => { if(!pos) return ''; const r = HAS_TOKEN && roadOf(x.s); return !HAS_TOKEN || (!r && x.d > 40) ? fmtKm(x.d) : r ? roadTxt(r) : '…'; };
+  if(!arr.length && TOWN) return head + emptyHTML('fuel', `No stations listed in ${esc(TOWN.n)}`, F.size || S.open ? 'Try turning off the brand or “Open now” filters.' : 'OpenStreetMap has no gas stations here yet.', 'Show all stations', 'town-clear');
+  if(!arr.length) return head + pinnedHTML(dist) + emptyHTML('fuel', S.open ? 'No stations known to be open' : 'No stations found nearby',
+    S.open ? 'Many stations don\'t list their hours yet. Turn off “Open now” to see every station.' : 'Tap the refresh button on the map to load stations where you are.', S.open ? 'Show all stations' : 'Open map', S.open ? 'open-toggle' : 'open-map');
+  const [n, ...rest] = arr;
+  const fb = F.size === 1 ? ([...F][0] === 'other' ? 'other-brand station' : brandName([...F][0])) : 'station';
+  const where = TOWN ? `in ${TOWN.n}` : 'nearby';
+  const label = cheap && pk(n) !== Infinity ? `Cheapest ${fuelName(S.fuel).toLowerCase()} ${where}, ${peso(pk(n))}` : TOWN ? `${pos ? 'Closest' : 'A'} station in ${TOWN.n}` : `Nearest ${fb}`;
+  return head + pinnedHTML(dist) + `
+    <section class="blk">
+      <div class="cap">${label}</div>
+      ${pos ? `<div class="amt">${dist(n)}</div>` : ''}
+      <div class="trunc" style="margin-top:6px;font-weight:600">${esc(n.s.name)}</div>
+      ${line(n.s) ? `<div class="cap trunc" style="margin-top:2px">${esc(line(n.s))}</div>` : ''}
+      <div class="g2" style="margin-top:18px">
+        <button class="pill" data-show="${esc(n.s.id)}">${I('map', 18)}Show on map</button>
+        <button class="pill" data-dir="${esc(n.s.id)}">${I('nav', 18)}Directions</button>
+      </div>
+    </section>
+    ${rest.length ? `<div class="card" style="padding:12px">
+      <div class="sub" style="padding:4px 4px 10px;font-size:14px">${TOWN ? `More in ${esc(TOWN.n)}` : 'More nearby'}</div>
+      <div class="inner">${rest.map(x => rowHTML(x, dist)).join('')}</div>
+    </div>` : ''}
+    <p class="tiny" style="margin:0;text-align:center">${!pos ? 'Turn on location to see how far each one is.' : HAS_TOKEN ? 'Distance by road from where you are.' : 'Straight-line distance.'}</p>`;
+}
+function settingsHTML(){
+  const head = (icon, t) => `<div class="sub" style="display:flex;gap:8px;align-items:center;padding:2px 4px 10px;font-size:14px">${I(icon, 18)}${t}</div>`;
+  const opt = (attr, val, cur, icon, t) => `<button role="radio" aria-checked="${cur === val}" class="${cur === val ? 'on' : ''}" ${attr}="${val}">${icon ? I(icon, 18) : ''}${t}</button>`;
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  return `<h1 class="h1">Settings</h1>
+  ${accountHTML()}
+  ${reviewHTML()}
+  <div class="card" style="padding:12px">
+    ${head('nav', 'Directions')}
+    <div class="seg3" role="radiogroup" aria-label="Open directions in">
+      ${opt('data-dir-set', 'google', S.dir, '', 'Google Maps')}${opt('data-dir-set', 'waze', S.dir, '', 'Waze')}${opt('data-dir-set', 'apple', S.dir, '', 'Apple Maps')}
+    </div>
+    <p class="tiny" style="margin:10px 4px 2px">The Directions button opens this app.</p>
+  </div>
+  ${PR.on === false ? '' : `<div class="card" style="padding:12px">
+    ${head('tag', 'Fuel prices')}
+    <div class="seg3" style="grid-template-columns:repeat(4,minmax(0,1fr))" role="radiogroup" aria-label="Fuel price to show">
+      ${opt('data-fuel-set', 'off', S.fuel, '', 'Off')}${FUELS.map(f => opt('data-fuel-set', f.k, S.fuel, '', f.n)).join('')}
+    </div>
+    <p class="tiny" style="margin:10px 4px 2px">${S.fuel === 'off' ? 'Prices are hidden.' : `The Nearby list shows ${fuelName(S.fuel).toLowerCase()} prices and can sort by the cheapest.`} Prices are shared by Karga users, so they can be out of date. You can update a station's prices from its card.</p>
+  </div>`}
+  <div class="card" style="padding:12px">
+    ${head('fuel', 'Stations')}
+    <div class="inner">
+      <div class="li"><span>Pinned stations</span><span style="font-weight:600">${S.fav.length}</span></div>
+      <div class="li"><span>Stations you added</span><span style="font-weight:600">${S.mine.length}</span></div>
+      <div class="li"><span>Stations saved on this device</span><span style="font-weight:600">${OSM.size}</span></div>
+    </div>
+    <p class="tiny" style="margin:10px 4px 2px">Station data comes from OpenStreetMap and stays on this device once loaded. Tap the refresh button on the map to load stations where you are now.</p>
+  </div>
+  <div class="card" style="padding:12px">
+    ${head('sun', 'Appearance')}
+    <div class="seg3" role="radiogroup" aria-label="Appearance">
+      ${opt('data-theme-set', 'light', S.theme, 'sun', 'Day')}${opt('data-theme-set', 'dark', S.theme, 'moon', 'Night')}${opt('data-theme-set', 'auto', S.theme, 'phone', 'Auto')}
+    </div>
+    <p class="tiny" style="margin:10px 4px 2px">Auto follows your iPhone's light or dark setting.</p>
+  </div>
+  ${standalone ? '' : `<div class="card" style="display:flex;gap:14px;align-items:flex-start">
+    <div class="logo" style="width:44px;height:44px;border-radius:12px;flex-shrink:0">${logo(26)}</div>
+    <div><div class="t15">Use it like an app</div><div class="sub" style="margin-top:3px;font-size:13.5px">In Safari, tap Share, then Add to Home Screen. Karga opens full screen, like a regular app.</div></div>
+  </div>`}
+  <button class="sec danger" data-act="erase">${I('trash', 18)}Erase all data</button>`;
+}
+/* ===== Events ===== */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-page],[data-act],[data-f],[data-show],[data-dir],[data-edit],[data-del],[data-fav],[data-theme-set],[data-dir-set],[data-fuel-set],[data-sort],[data-town],[data-price],[data-confirm],[data-status],[data-decide],[data-approve],[data-rename]');
+  if(!t) return;
+  const ds = t.dataset;
+  if(ds.page) return go(ds.page);
+  if(ds.confirm) return confirmPrice(ds.confirm);
+  if(ds.status != null){
+    const [id, v] = ds.status.split('|');
+    if(!AU.user) return needSignIn(id, 'card');
+    if(v === 'closed') return confirmSheet('Report this station closed?', "Only report it if the station is closed for good or no longer sells fuel. We'll review it before marking it closed.", 'Report closed', true, () => sendStatus(id, 'closed'));
+    return sendStatus(id, v || null);
+  }
+  if(ds.decide){
+    const [id, v] = ds.decide.split('|');
+    if(v === 'closed') return confirmSheet('Mark this station closed?', "Everyone will see it as closed: faded on the map and at the end of lists. You can mark it open again later.", 'Mark closed', true, () => decide(id, {closed:true}, 'Marked closed'));
+    if(v === 'open') return decide(id, {closed:false}, 'Marked open');
+    return decide(id, {}, 'Reports dismissed');
+  }
+  if(ds.approve){
+    const [id, b, ...rest] = ds.approve.split('|');
+    return decide(id, {closed:false, name:rest.join('|'), b}, 'Renamed. Everyone sees the new name now');
+  }
+  if(ds.rename){ const id = ds.rename; closeSheet(); return openRenameForm(id); }
+  if(ds.fav) return toggleFav(ds.fav);
+  if(ds.town) return pickTown(ds);
+  if(ds.price){ const id = ds.price; closeSheet(); return openPriceForm(id); }
+  if(ds.sort){ S.sort = ds.sort; persist(); return render(); }
+  if(ds.fuelSet){ S.fuel = ds.fuelSet; persist(); return render(); }
+  if(ds.f){
+    if(ds.f === 'all') F.clear(); else F.has(ds.f) ? F.delete(ds.f) : F.add(ds.f);
+    S.f = [...F]; persist(); refreshMap();
+    page === 'map' ? renderTop() : render();
+    return;
+  }
+  if(ds.show){
+    const s = find(ds.show); if(!s) return;
+    go('map'); setTimeout(() => openStation(s.id), 60); return;
+  }
+  if(ds.dir){ const s = find(ds.dir); if(s) window.open(dirUrl(s), '_blank', 'noopener'); return; }
+  if(ds.edit){ const id = ds.edit; closeSheet(); openForm({editId:id}); return; }
+  if(ds.del){
+    const id = ds.del;
+    confirmSheet('Delete this station?', "It will be removed from your map. This can't be undone.", 'Delete station', true, () => {
+      S.mine = S.mine.filter(x => x.id !== id); S.fav = S.fav.filter(x => x.id !== id); persist(); refreshMap(); toast('Station deleted');
+    });
+    return;
+  }
+  if(ds.themeSet){ S.theme = ds.themeSet; persist(); applyTheme(S.theme); restyleMap(); render(); return; }
+  if(ds.dirSet){ S.dir = ds.dirSet; persist(); render(); return; }
+  switch(ds.act){
+    case 'start': return getStarted();
+    case 'add': return startPlace();
+    case 'locate': closeSheet(); return locateMe();
+    case 'open-map': return go('map');
+    case 'retry': return loadArea(true);
+    case 'place-ok': {
+      const c = map.getCenter(), editId = placing && placing.editId;
+      endPlace(); openForm({lat:c.lat, lon:c.lng, editId}); return;
+    }
+    case 'place-cancel': endPlace(); return;
+    case 'signin': return signIn();
+    case 'goto-signin': return gotoSignIn();
+    case 'review-refresh': REV.list = null; return render();
+    case 'signout': return signOut();
+    case 'refresh': return refreshHere();
+    case 'search': return openSearch();
+    case 'town-clear': return clearTown();
+    case 'open-toggle':
+      S.open = !S.open; persist(); refreshMap();
+      if(S.open) toast('Showing stations open right now. Many stations don\'t list their hours yet.');
+      return page === 'map' ? renderTop() : render();
+    case 'erase':
+      return confirmSheet('Erase all data?', AU.user
+        ? "This removes your settings, pinned stations and every station you added from this device and from your Google account, deletes the fuel prices you shared, and signs you out. This can't be undone."
+        : "This removes your settings, pinned stations and every station you added from this device. This can't be undone.", 'Erase all data', true, async () => {
+        try{ await eraseCloud(); }catch(err){ console.warn(err); toast("Couldn't erase your account data. Check your connection and try again."); return; }
+        try{ localStorage.removeItem(KEY); localStorage.removeItem(OSM_KEY); localStorage.removeItem(ROAD_KEY); }catch(err){}
+        location.reload();
+      });
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if($('scrim')) closeSheet(); else if(placing) endPlace();
+});
+
+/* ===== Start ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(S.theme);
+  render();
+  if(started()) startLocate();
+  initData();
+  initFirebase();
+  if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+});
+</script>
+</body>
+</html>

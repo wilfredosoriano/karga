@@ -1,0 +1,92 @@
+rules_version = '2';
+// Paste into Firebase console → Firestore Database → Rules, then Publish.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admins are listed by hand in the Firebase console: a document admins/<uid> (any content).
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid; // so the app can tell you're an admin
+      allow write: if false;                                          // only from the console
+    }
+
+    // Admin decisions about stations: decisions/<stationId> = { closed, name?, b?, at, by }.
+    // Only these mark a station closed or rename it; community reports are just for review.
+    match /decisions/{sid} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && sid.matches('^[nwr][0-9]{1,15}$')
+        && request.resource.data.keys().hasOnly(['closed', 'name', 'b', 'at', 'by'])
+        && request.resource.data.closed is bool
+        && (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60))
+        && (!('b' in request.resource.data) || request.resource.data.b in ['petron', 'shell', 'caltex', 'seaoil', 'phoenix', 'flyingv', 'total', 'jetti', 'ptt', 'unioil', 'centrum', 'cleanfuel', 'other'])
+        && request.resource.data.by == request.auth.uid
+        && request.resource.data.at == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // Each person's pinned and added stations. Only they can read or change them.
+    match /users/{uid} {
+      allow read, write, delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Fuel price reports: one document per person per station per fuel,
+    // with the id "<stationId>_<fuel>_<uid>". Anyone can read; only the signed-in owner can write.
+    match /reports/{id} {
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['s', 'f', 'p', 'at', 'uid'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.s is string
+        && request.resource.data.s.matches('^[nwr][0-9]{1,15}$')
+        && request.resource.data.f in ['unleaded', 'premium', 'diesel']
+        && id == request.resource.data.s + '_' + request.resource.data.f + '_' + request.auth.uid
+        && request.resource.data.p is number
+        && request.resource.data.p >= 30 && request.resource.data.p <= 150
+        && request.resource.data.at == request.time
+        // the same person can change a report at most once a minute
+        && (resource == null || request.time > resource.data.at + duration.value(60, 's'));
+
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // "Reopened with a new name" suggestions: one per person per station, id "<stationId>_<uid>".
+    // Only admins (and the person who sent it) can read them; an admin approves by writing a decision.
+    match /changes/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['s', 'name', 'b', 'at', 'uid'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.s is string
+        && request.resource.data.s.matches('^[nwr][0-9]{1,15}$')
+        && id == request.resource.data.s + '_' + request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.b in ['petron', 'shell', 'caltex', 'seaoil', 'phoenix', 'flyingv', 'total', 'jetti', 'ptt', 'unioil', 'centrum', 'cleanfuel', 'other']
+        && request.resource.data.at == request.time
+        && (resource == null || request.time > resource.data.at + duration.value(60, 's'));
+      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+    }
+
+    // Open/closed reports: one document per person per station, id "<stationId>_<uid>".
+    // These are only reports for an admin to review; a station is closed only by an admin decision.
+    match /status/{id} {
+      allow read: if true;
+
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['s', 'v', 'at', 'uid'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.s is string
+        && request.resource.data.s.matches('^[nwr][0-9]{1,15}$')
+        && request.resource.data.v in ['closed', 'open']
+        && id == request.resource.data.s + '_' + request.auth.uid
+        && request.resource.data.at == request.time
+        && (resource == null || request.time > resource.data.at + duration.value(60, 's'));
+
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+  }
+}
