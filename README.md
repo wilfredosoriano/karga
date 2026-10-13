@@ -32,6 +32,10 @@ Search only suggests cities and towns, from `api/towns.js` (which reads `api/_to
 
 The layers button on the map picks the map style: Simple (the default, follows Day/Night), Streets and Satellite (Mapbox Standard, with their own night lighting), or Terrain (green parks and hills). The 3D view switch tilts the map, raises hills and mountains, and shows 3D buildings when zoomed in; two fingers then turn and tilt the map. Both choices are saved on the phone. Switching styles doesn't count as a new Mapbox map load.
 
+## Desktop layout and tips
+
+The same page adapts to bigger screens: phones keep the one-column layout; from 768px wide the Nearby page splits into two columns, Settings into two balanced columns, and sheets become centered dialogs; from 1024px the bottom nav becomes a left sidebar beside the full-screen map. A guided tour shows the map's main buttons the first time the app opens, and a short one the first time a station card opens. Each shows once per device; Settings → Show tips again replays it.
+
 ## Opening hours
 
 Stations carry OpenStreetMap's `opening_hours` when it's listed. The app shows "Open · closes 10 PM" style badges and has an "Open now" filter. Many stations don't list hours, so that filter only shows stations known to be open.

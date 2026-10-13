@@ -143,18 +143,75 @@ body.placing .mtop,body.placing .navwrap{display:none}
 .bico{width:42px;height:42px;border-radius:21px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
 .bico .star{position:absolute;right:-3px;top:-3px;width:18px;height:18px;border-radius:9px;background:#f5b301;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--card2)}
 .mbtns{display:flex;gap:8px}
-.mtypes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.mtype{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:8px;border-radius:16px;border:2px solid var(--line);background:var(--card);text-align:left}
+.mtype{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border:2px solid transparent}
 .mtype.on{border-color:var(--fill)}
-.mtype .sw{display:block;width:100%;height:64px;border-radius:10px;margin-bottom:4px}
-.li3d{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card);width:100%}
-.tg{width:46px;height:28px;border-radius:14px;background:var(--track);position:relative;flex-shrink:0;transition:background .2s}
-.tg::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:11px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
-.tg.on{background:var(--fill)}.tg.on::after{transform:translateX(18px)}
+.mtype .ico{margin-bottom:6px}
 .sel{white-space:nowrap;flex-shrink:0}
 .sbar{flex:1;min-width:0;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card2);display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .mtop .mchips{flex:none}
 .rb.spin svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+/* ===== Responsive layout (design system, Phase 2) ===== */
+.cols,.cols>div,.grid,.masonry{display:contents}
+.nav .brandmark{display:none}
+@media (min-width:768px){
+  .app{max-width:760px;padding-left:24px;padding-right:24px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;align-items:start}
+  .cols>div{display:flex;flex-direction:column;gap:18px;min-width:0}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  .masonry{display:block;columns:2;column-gap:18px}
+  .masonry>*{break-inside:avoid;margin:0 0 18px}
+  .scrim{align-items:center;padding:24px}
+  .sheet{border-radius:26px;max-width:520px;max-height:min(86vh,860px);padding:16px 20px 20px}
+  .sheet .grab{display:none}
+}
+@media (min-width:768px) and (prefers-reduced-motion:no-preference){
+  .sheet{animation:pop .18s ease-out}
+  @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+}
+@media (min-width:1024px){
+  body.nav-on{padding-left:248px}
+  body.nav-on .toast{left:calc(50% + 124px)}
+  .app{max-width:1080px;padding:28px 40px 48px}
+  .welcome{max-width:480px}
+  .navwrap{top:0;bottom:0;right:auto;width:248px;padding:0;display:block}
+  .nav{flex-direction:column;align-items:stretch;height:100%;border-radius:0;border:none;border-right:1px solid var(--line);box-shadow:none;background:var(--bg);padding:calc(20px + env(safe-area-inset-top,0px)) 14px 20px;gap:4px}
+  .nav .brandmark{display:flex;align-items:center;gap:10px;padding:2px 10px 22px;font-size:20px;font-weight:600;letter-spacing:-.02em}
+  .nav .brandmark .mark{width:34px;height:34px;border-radius:10px;background:var(--fill);color:var(--on);display:flex;align-items:center;justify-content:center}
+  .nav button{justify-content:flex-start;height:46px;border-radius:14px;padding:0 14px;gap:12px;font-size:14.5px}
+  .nav button .t{display:inline}
+  .nav .div{display:none}
+  .nav .act{width:auto;height:46px;border-radius:14px;padding:0 14px;justify-content:flex-start;background:var(--card);margin-top:auto}
+}
+@media (hover:hover){
+  .nav button:not(.on):hover{background:var(--card);color:var(--ink)}
+  .nav .act:hover{background:var(--track)}
+  button.card:hover,.lirow:hover{opacity:.82}
+}
+/* Karga: the full-screen map sits beside the sidebar on desktop, and its top bar sits on the left from tablet up */
+@media (min-width:768px){
+  .mtop{margin:0;max-width:560px;padding-left:24px;padding-right:24px}
+}
+@media (min-width:1024px){
+  body.nav-on #mapPage,body.nav-on .placebar{left:248px}
+  body.placing.nav-on{padding-left:0}
+  body.placing.nav-on #mapPage,body.placing.nav-on .placebar{left:0}
+  body.placing.nav-on .toast{left:50%}
+  .mapboxgl-ctrl-bottom-left,.mapboxgl-ctrl-bottom-right{bottom:0!important}
+}
+@media (hover:hover){
+  button.li:hover{opacity:.82}
+  .rb:hover,.sel:not(.on):hover,.sbar:hover{background:var(--card)}
+}
+/* ===== Guided tour (design system, Phase 2) ===== */
+.tour{position:fixed;inset:0;z-index:30}
+.tour-ring{position:fixed;border-radius:16px;box-shadow:0 0 0 3px #fff,0 0 0 9999px rgba(0,0,0,.6);pointer-events:none}
+.tour-tip{position:fixed;width:min(320px,calc(100vw - 32px));background:var(--card2);color:var(--ink);border-radius:20px;padding:16px 16px 14px;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.tour-tip .t15{font-size:16px}
+.tour-d{font-size:14px;color:var(--muted);margin:6px 0 14px;line-height:1.45}
+.tour-arrow{position:absolute;width:14px;height:14px;background:var(--card2);transform:rotate(45deg);border-radius:2px}
+.tour-skip{height:40px;padding:0 12px;font-size:14px;color:var(--muted);font-weight:500}
+.tour-next{height:40px;padding:0 20px;border-radius:20px;background:var(--fill);color:var(--on);font-size:14px;font-weight:600}
+@media (prefers-reduced-motion:no-preference){.tour-ring,.tour-tip{transition:top .2s ease,left .2s ease,width .2s ease,height .2s ease}}
 </style>
 </head>
 <body>
@@ -165,11 +222,12 @@ body.placing .mtop,body.placing .navwrap{display:none}
 </div>
 <div id="page"></div>
 <div class="navwrap" id="navwrap" style="display:none"><nav class="nav" aria-label="Main">
+  <div class="brandmark" aria-hidden="true"><span class="mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 1.5c-4.3 0-7.8 3.4-7.8 7.7 0 4.9 5.6 10.1 7 11.3.5.4 1.1.4 1.6 0 1.4-1.2 7-6.4 7-11.3 0-4.3-3.5-7.7-7.8-7.7zm0 3.6s-3.4 3.9-3.4 6.2a3.4 3.4 0 0 0 6.8 0c0-2.3-3.4-6.2-3.4-6.2z"/><rect x="7.5" y="21.3" width="9" height="2" rx="1"/></svg></span><span>Karga</span></div>
   <button data-page="map" aria-label="Map"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.1 6.1 9.9 3.9a2 2 0 0 0-1.8 0L3.6 6.2A1 1 0 0 0 3 7.1v13.3a1 1 0 0 0 1.4.9l3.7-1.9a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V5.1a1 1 0 0 0-1.4-.9l-3.7 1.9a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg><span class="t">Map</span></button>
   <button data-page="list" aria-label="Nearby"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="t">Nearby</span></button>
   <button data-page="settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg><span class="t">Settings</span></button>
   <span class="div" aria-hidden="true"></span>
-  <button class="act" data-act="add" aria-label="Add station"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+  <button class="act" data-act="add" aria-label="Add station"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="t">Add station</span></button>
 </nav></div>
 
 <script>
@@ -206,11 +264,15 @@ const P = {
   pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
   refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
   layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+  road:'<path d="M4 21 8 3M20 21 16 3M12 4v2M12 10v4M12 18v2"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  mountain:'<path d="m8 3 4 8 5-5 5 15H2z"/>',
   edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
   move:'<path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>',
   sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  star:'<path d="M12 2l3 6.9 7.5.7-5.7 5 1.7 7.4L12 18l-6.5 4 1.7-7.4L1.5 9.6 9 8.9z"/>',
   phone:'<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
@@ -242,10 +304,10 @@ const isDark = () => S.theme === 'dark' || (S.theme === 'auto' && darkMQ.matches
 // Map styles people can pick from the layers button. Simple follows Day/Night; Streets and Satellite
 // (Mapbox Standard) switch to their night lighting instead. Terrain has no night version.
 const MAP_TYPES = [
-  {k:'simple', n:'Simple', d:'Quiet, so stations stand out', bg:'linear-gradient(135deg,#f3f3f1 0 55%,#e2e2df 55% 60%,#f3f3f1 60%)'},
-  {k:'streets', n:'Streets', d:'Colorful roads and places', bg:'linear-gradient(135deg,#e8eef3 0 40%,#f7d47a 40% 46%,#e8eef3 46% 70%,#bfe3b4 70%)'},
-  {k:'satellite', n:'Satellite', d:'Photos from above', bg:'linear-gradient(135deg,#2f4a2c,#55704a 45%,#8a8f7a 70%,#3d5b6e)'},
-  {k:'terrain', n:'Terrain', d:'Green parks, hills, mountains', bg:'linear-gradient(135deg,#cfe6c0,#a8d08d 50%,#e9e3cf 75%,#9cc7e0)'},
+  {k:'simple', n:'Simple', d:'Quiet, so stations stand out', i:'map'},
+  {k:'streets', n:'Streets', d:'Colorful roads and places', i:'road'},
+  {k:'satellite', n:'Satellite', d:'Photos from above', i:'globe'},
+  {k:'terrain', n:'Terrain', d:'Green parks, hills, mountains', i:'mountain'},
 ];
 const mapType = () => MAP_TYPES.some(t => t.k === S.mapType) ? S.mapType : 'simple';
 const isStd = () => mapType() === 'streets' || mapType() === 'satellite';
@@ -581,11 +643,12 @@ function apply3d(move){
 }
 function openMapStyle(){
   openSheet(`${sheetHead('Map style')}
-    <div class="mtypes" role="radiogroup" aria-label="Map style">${MAP_TYPES.map(t => `<button role="radio" aria-checked="${mapType() === t.k}" class="mtype${mapType() === t.k ? ' on' : ''}" data-act="maptype-${t.k}">
-      <span class="sw" style="background:${t.bg}"></span><span class="t15">${t.n}</span><span class="tiny">${t.d}</span></button>`).join('')}</div>
-    <button class="li3d" role="switch" aria-checked="${S.map3d}" data-act="map-3d"><span>${I('layers', 20)}</span>
-      <span style="flex:1;text-align:left"><span class="t15" style="display:block">3D view</span><span class="tiny">Tilted map with hills and 3D buildings. Use two fingers to turn and tilt.</span></span>
-      <span class="tg${S.map3d ? ' on' : ''}"></span></button>`);
+    <div class="g2" role="radiogroup" aria-label="Map style">${MAP_TYPES.map(t => `<button role="radio" aria-checked="${mapType() === t.k}" class="card mtype${mapType() === t.k ? ' on' : ''}" data-act="maptype-${t.k}">
+      <span class="ico">${I(t.i)}</span><span class="t15">${t.n}</span><span class="sub">${t.d}</span></button>`).join('')}</div>
+    <div class="card" style="padding:12px"><div class="inner">
+      <label class="li" for="m3d" style="cursor:pointer"><span><span class="t15" style="display:block">3D view</span><span class="sub">Hills and 3D buildings. ${matchMedia('(hover:hover)').matches ? 'Right-drag' : 'Use two fingers'} to turn and tilt.</span></span>
+      <input class="sw" type="checkbox" id="m3d" data-act="map-3d"${S.map3d ? ' checked' : ''}></label>
+    </div></div>`);
 }
 function setMapType(k){
   if(k === mapType()) return;
@@ -595,14 +658,15 @@ function setMapType(k){
 function toggle3d(){
   S.map3d = !S.map3d; persist();
   if(map && map.isStyleLoaded()) apply3d(true);
-  const b = document.querySelector('[data-act="map-3d"]'); if(b){ b.setAttribute('aria-checked', S.map3d); b.querySelector('.tg').classList.toggle('on', S.map3d); }
 }
 function refreshMap(){ if(map && map.getSource('st')) map.getSource('st').setData(fc(mapStations())); }
 function updateMe(){ if(map && map.getSource('me')) map.getSource('me').setData(fc(pos ? [{id:'me', ...pos}] : [])); }
 function setSel(){ if(map && map.getSource('sel')){ const s = selId && find(selId); map.getSource('sel').setData(fc(s ? [s] : [])); } }
 function focusStation(s){
   if(!map) return;
-  map.easeTo({center:[s.lon, s.lat], zoom:Math.max(map.getZoom(), 15), padding:{top:0, bottom:Math.round(innerHeight*.45), left:0, right:0}});
+  const w = map.getContainer().clientWidth, free = (w - 520) / 2;
+  const padding = WIDE.matches && free >= 120 ? {top:0, bottom:0, left:0, right:w - free} : {top:0, bottom:Math.round(innerHeight*.45), left:0, right:0};
+  map.easeTo({center:[s.lon, s.lat], zoom:Math.max(map.getZoom(), 15), padding});
 }
 
 /* ===== Sheets and toast ===== */
@@ -1081,8 +1145,10 @@ function openStation(id){
       if(isClosed(s) !== before) return openStation(id); // the closed badge changed: redraw the card
       const el = $('prices'); if(el) el.outerHTML = pricesHTML(s);
       const st = $('status'); if(st) st.innerHTML = closedHTML(s);
+      if(tour) placeTour();
     });
   }
+  maybeTour('station');
 }
 async function roadFor(s){
   const o = {...pos};
@@ -1211,10 +1277,12 @@ function renderTop(){
     <div class="mchips" role="group" aria-label="Filters">${chipsHTML()}</div>
     ${TOWN ? `<div>${townChip()}</div>` : ''}
     <div id="mstatus">${statusHTML()}</div>`;
+  if(tour) placeTour();
 }
 function render(){
   const root = $('page'), welcome = !started();
   $('navwrap').style.display = welcome ? 'none' : '';
+  document.body.classList.toggle('nav-on', !welcome);
   document.body.classList.toggle('on-map', !welcome && page === 'map');
   if(welcome){ root.innerHTML = welcomeHTML(); return; }
   document.querySelectorAll('.nav [data-page]').forEach(b => { const on = b.dataset.page === page; b.classList.toggle('on', on); on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'); });
@@ -1222,10 +1290,15 @@ function render(){
     root.innerHTML = '';
     renderTop();
     if(!mapStarted){ mapStarted = true; initMap(); } else if(map) map.resize();
+    if(tour) placeTour(); else maybeTour('main');
     return;
   }
   root.innerHTML = `<main class="app">${page === 'list' ? listHTML() : settingsHTML()}</main>`;
+  if(tour) placeTour();
 }
+// Tablet and desktop put some pages in two columns, so re-render when crossing 768px.
+const WIDE = matchMedia('(min-width:768px)');
+WIDE.addEventListener('change', () => { if(started()) render(); });
 function welcomeHTML(){
   return `<main class="welcome">
     <div class="logo">${logo(40)}</div>
@@ -1265,7 +1338,9 @@ function listHTML(){
       <div class="sub" style="display:flex;gap:6px;align-items:center;padding:4px 4px 10px;font-size:14px"><span style="color:#f5b301;display:flex">${starIco(16, true)}</span>Pinned</div>
       <div class="inner">${favs.map(s => ({s, d:pos ? km(pos, s) : null})).sort((a, b) => (a.d ?? 0) - (b.d ?? 0)).map(x => rowHTML(x, dist)).join('')}</div>
     </div>` : '';
-  if(!pos && !TOWN) return head + pinnedHTML(() => '') + emptyHTML('pin', 'Location is off', 'Turn on location to sort stations by distance.', 'Use my location', 'locate');
+  // Phones: pinned card above the main content. Tablet and desktop: main on the left, pinned on the right.
+  const split = (side, main) => WIDE.matches && side ? `<div class="cols"><div>${main}</div><div>${side}</div></div>` : side + main;
+  if(!pos && !TOWN) return head + split(pinnedHTML(() => ''), emptyHTML('pin', 'Location is off', 'Turn on location to sort stations by distance.', 'Use my location', 'locate'));
   // Take the 24 closest in a straight line (within 40 km, or anywhere in the picked town),
   // then rank them by road distance once Mapbox answers.
   const near = allStations().filter(s => passes(s) && (!TOWN || s.t === TOWN.id)).map(s => ({s, d:pos ? km(pos, s) : 0}))
@@ -1282,13 +1357,13 @@ function listHTML(){
   const arr = near.sort((a, b) => (isClosed(a.s) - isClosed(b.s)) || (cheap ? (pk(a) - pk(b)) || (rk(a) - rk(b)) : rk(a) - rk(b)));
   const dist = x => { if(!pos) return ''; const r = HAS_TOKEN && roadOf(x.s); return !HAS_TOKEN || (!r && x.d > 40) ? fmtKm(x.d) : r ? roadTxt(r) : '…'; };
   if(!arr.length && TOWN) return head + emptyHTML('fuel', `No stations listed in ${esc(TOWN.n)}`, F.size || S.open ? 'Try turning off the brand or “Open now” filters.' : 'OpenStreetMap has no gas stations here yet.', 'Show all stations', 'town-clear');
-  if(!arr.length) return head + pinnedHTML(dist) + emptyHTML('fuel', S.open ? 'No stations known to be open' : 'No stations found nearby',
-    S.open ? 'Many stations don\'t list their hours yet. Turn off “Open now” to see every station.' : 'Tap the refresh button on the map to load stations where you are.', S.open ? 'Show all stations' : 'Open map', S.open ? 'open-toggle' : 'open-map');
+  if(!arr.length) return head + split(pinnedHTML(dist), emptyHTML('fuel', S.open ? 'No stations known to be open' : 'No stations found nearby',
+    S.open ? 'Many stations don\'t list their hours yet. Turn off “Open now” to see every station.' : 'Tap the refresh button on the map to load stations where you are.', S.open ? 'Show all stations' : 'Open map', S.open ? 'open-toggle' : 'open-map'));
   const [n, ...rest] = arr;
   const fb = F.size === 1 ? ([...F][0] === 'other' ? 'other-brand station' : brandName([...F][0])) : 'station';
   const where = TOWN ? `in ${TOWN.n}` : 'nearby';
   const label = cheap && pk(n) !== Infinity ? `Cheapest ${fuelName(S.fuel).toLowerCase()} ${where}, ${peso(pk(n))}` : TOWN ? `${pos ? 'Closest' : 'A'} station in ${TOWN.n}` : `Nearest ${fb}`;
-  return head + pinnedHTML(dist) + `
+  return head + split(pinnedHTML(dist), `
     <section class="blk">
       <div class="cap">${label}</div>
       ${pos ? `<div class="amt">${dist(n)}</div>` : ''}
@@ -1303,13 +1378,18 @@ function listHTML(){
       <div class="sub" style="padding:4px 4px 10px;font-size:14px">${TOWN ? `More in ${esc(TOWN.n)}` : 'More nearby'}</div>
       <div class="inner">${rest.map(x => rowHTML(x, dist)).join('')}</div>
     </div>` : ''}
-    <p class="tiny" style="margin:0;text-align:center">${!pos ? 'Turn on location to see how far each one is.' : HAS_TOKEN ? 'Distance by road from where you are.' : 'Straight-line distance.'}</p>`;
+    <p class="tiny" style="margin:0;text-align:center">${!pos ? 'Turn on location to see how far each one is.' : HAS_TOKEN ? 'Distance by road from where you are.' : 'Straight-line distance.'}</p>`);
 }
 function settingsHTML(){
   const head = (icon, t) => `<div class="sub" style="display:flex;gap:8px;align-items:center;padding:2px 4px 10px;font-size:14px">${I(icon, 18)}${t}</div>`;
   const opt = (attr, val, cur, icon, t) => `<button role="radio" aria-checked="${cur === val}" class="${cur === val ? 'on' : ''}" ${attr}="${val}">${icon ? I(icon, 18) : ''}${t}</button>`;
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const ua = navigator.userAgent, apple = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const install = apple ? 'In Safari, tap Share, then Add to Home Screen. Karga opens full screen, like a regular app.'
+    : /Android/.test(ua) ? 'In Chrome, tap the ⋮ menu, then Add to Home screen or Install app. Karga opens full screen, like a regular app.'
+    : 'In Chrome or Edge, click the install icon in the address bar. Karga opens in its own window, like a regular app.';
   return `<h1 class="h1">Settings</h1>
+  <div class="masonry">
   ${accountHTML()}
   ${reviewHTML()}
   <div class="card" style="padding:12px">
@@ -1340,14 +1420,87 @@ function settingsHTML(){
     <div class="seg3" role="radiogroup" aria-label="Appearance">
       ${opt('data-theme-set', 'light', S.theme, 'sun', 'Day')}${opt('data-theme-set', 'dark', S.theme, 'moon', 'Night')}${opt('data-theme-set', 'auto', S.theme, 'phone', 'Auto')}
     </div>
-    <p class="tiny" style="margin:10px 4px 2px">Auto follows your iPhone's light or dark setting.</p>
+    <p class="tiny" style="margin:10px 4px 2px">Auto follows your ${/iPhone|iPad/.test(navigator.userAgent) ? "iPhone's" : "device's"} light or dark setting.</p>
   </div>
   ${standalone ? '' : `<div class="card" style="display:flex;gap:14px;align-items:flex-start">
     <div class="logo" style="width:44px;height:44px;border-radius:12px;flex-shrink:0">${logo(26)}</div>
-    <div><div class="t15">Use it like an app</div><div class="sub" style="margin-top:3px;font-size:13.5px">In Safari, tap Share, then Add to Home Screen. Karga opens full screen, like a regular app.</div></div>
+    <div><div class="t15">Use it like an app</div><div class="sub" style="margin-top:3px;font-size:13.5px">${install}</div></div>
   </div>`}
+  </div>
+  <button class="sec" data-act="tips-again">${I('star', 18)}Show tips again</button>
   <button class="sec danger" data-act="erase">${I('trash', 18)}Erase all data</button>`;
 }
+/* ===== Guided tour (first-use tips) ===== */
+// Each tour shows once per device (S.tips, not synced). Settings → Show tips again clears it.
+const TOURS = {
+  main: [
+    {el:'#mtop .sbar', t:'Search a town', d:'See every gas station in a city or town, for example before a trip.'},
+    {el:'#mtop [data-f="all"]', t:'Filter by brand', d:'Show only the brands you like. Tap more than one to compare.'},
+    {el:'#mtop [data-act="open-toggle"]', t:'Open now', d:'Hide stations that are closed right now.'},
+    {el:'#mtop [data-act="refresh"]', t:'Load stations here', d:'After you travel, tap this to load the stations around you.'},
+    {el:'#mtop [data-act="map-style"]', t:'Map style', d:'Switch to streets, satellite or terrain, or turn on the 3D view.'},
+    {el:'#mtop [data-act="locate"]', t:'Your location', d:'Jump back to where you are.'},
+    {el:'.nav [data-page="list"]', t:'Nearby', d:'The closest stations by road, with prices. Sort by the cheapest.'},
+    {el:'.nav [data-act="add"]', t:'Add a station', d:'Missing a station? Pin it on the map so it shows for you.'},
+    {el:'.nav [data-page="settings"]', t:'Settings', d:'Directions app, fuel prices, appearance, and Show tips again.'}
+  ],
+  station: [
+    {el:'.sheet [data-dir]', t:'Directions', d:'Open the route in your maps app.'},
+    {el:'.sheet [data-fav]', t:'Pin it', d:'Pinned stations stay at the top of Nearby and always show on the map.'},
+    {el:'.sheet [data-price]', t:'Share prices', d:'Saw the price board? Update it so other drivers know.'},
+    {el:'.sheet [data-status]', t:'Report changes', d:'Tell us if this station closed or has a new name.'}
+  ]
+};
+let tour = null;
+const onScreen = sel => { const e = document.querySelector(sel); if(!e) return null; const b = e.getBoundingClientRect(); return b.width && b.height ? e : null; };
+function maybeTour(id){                       // called at the end of render() for the map, and after opening a station
+  if(tour || S.tips[id] || !started()) return;
+  setTimeout(() => {
+    if(tour || S.tips[id] || placing) return;
+    if(id === 'main' && ($('scrim') || page !== 'map')) return; // no page tour over a sheet
+    const steps = TOURS[id].filter(s => onScreen(s.el)); if(!steps.length) return;
+    tour = {id, steps, i:0};
+    document.body.insertAdjacentHTML('beforeend', `<div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tourT">
+      <div class="tour-ring"></div>
+      <div class="tour-tip"><div class="tour-arrow"></div><div class="t15" id="tourT"></div><div class="tour-d" id="tourD"></div>
+        <div class="row"><span class="tiny" id="tourN"></span><div style="display:flex;gap:4px;align-items:center">
+          <button class="tour-skip" data-tour-act="skip">Skip</button><button class="tour-next" data-tour-act="next">Next</button></div></div>
+      </div></div>`);
+    showStep();
+  }, 450);
+}
+function showStep(){
+  const st = tour.steps[tour.i], e = onScreen(st.el); if(!e) return nextStep();
+  if(!e.closest('.navwrap') && !e.closest('#mtop')) e.scrollIntoView({block:'center'});
+  const $id = id => document.getElementById(id);
+  $id('tourT').textContent = st.t; $id('tourD').textContent = st.d; $id('tourN').textContent = `${tour.i+1} of ${tour.steps.length}`;
+  const next = document.querySelector('[data-tour-act="next"]'); next.textContent = tour.i === tour.steps.length-1 ? 'Done' : 'Next';
+  placeTour(); next.focus({preventScroll:true}); requestAnimationFrame(placeTour);
+}
+function placeTour(){
+  if(!tour) return; const e = onScreen(tour.steps[tour.i].el); if(!e) return;
+  const b = e.getBoundingClientRect(), pad = 6, gap = 16, vw = innerWidth, vh = innerHeight;
+  const ring = document.querySelector('.tour-ring'), tip = document.querySelector('.tour-tip'), arrow = document.querySelector('.tour-arrow');
+  Object.assign(ring.style, {left:`${b.left-pad}px`, top:`${b.top-pad}px`, width:`${b.width+pad*2}px`, height:`${b.height+pad*2}px`,
+    borderRadius:`${(parseFloat(getComputedStyle(e).borderTopLeftRadius)||10)+pad}px`});
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  if(vw >= 1024 && e.closest('.navwrap')){   // desktop sidebar: tip on the right
+    const y = Math.min(Math.max(b.top + b.height/2 - th/2, 8), vh - th - 8);
+    Object.assign(tip.style, {left:`${b.right+pad+gap}px`, top:`${y}px`});
+    Object.assign(arrow.style, {left:'-6px', top:`${Math.min(Math.max(b.top + b.height/2 - y - 7, 14), th - 28)}px`, bottom:'auto'}); return;
+  }
+  const below = b.bottom + pad + gap + th <= vh - 8 || b.top - pad - gap - th < 8;
+  const x = Math.min(Math.max(b.left + b.width/2 - tw/2, 16), vw - tw - 16);
+  const y = below ? Math.min(b.bottom + pad + gap, vh - th - 8) : b.top - pad - gap - th;
+  Object.assign(tip.style, {left:`${x}px`, top:`${Math.max(8, y)}px`});
+  Object.assign(arrow.style, {left:`${Math.min(Math.max(b.left + b.width/2 - x - 7, 18), tw - 32)}px`, top: below ? '-6px' : 'auto', bottom: below ? 'auto' : '-6px'});
+}
+function nextStep(){ if(!tour) return; tour.i++; tour.i >= tour.steps.length ? endTour() : showStep(); }
+function endTour(){ if(!tour) return; S.tips[tour.id] = true; persist(); tour = null; document.getElementById('tour')?.remove(); }
+document.addEventListener('click', e => { const b = e.target.closest('[data-tour-act]'); if(b) b.dataset.tourAct === 'next' ? nextStep() : endTour(); });
+addEventListener('resize', placeTour); addEventListener('scroll', placeTour, {passive:true});
+document.addEventListener('scroll', placeTour, {passive:true, capture:true}); // sheets and the chip row scroll on their own
+
 /* ===== Events ===== */
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-page],[data-act],[data-f],[data-show],[data-dir],[data-edit],[data-del],[data-fav],[data-theme-set],[data-dir-set],[data-fuel-set],[data-sort],[data-town],[data-price],[data-confirm],[data-status],[data-decide],[data-approve],[data-rename]');
@@ -1416,6 +1569,7 @@ document.addEventListener('click', e => {
     case 'signout': return signOut();
     case 'refresh': return refreshHere();
     case 'map-style': return openMapStyle();
+    case 'tips-again': S.tips = {}; persist(); return go('map');
     case 'map-3d': return toggle3d();
     case 'search': return openSearch();
     case 'town-clear': return clearTown();
@@ -1435,6 +1589,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
+  if(tour) return endTour();
   if($('scrim')) closeSheet(); else if(placing) endPlace();
 });
 
