@@ -143,6 +143,14 @@ body.placing .mtop,body.placing .navwrap{display:none}
 .bico{width:42px;height:42px;border-radius:21px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
 .bico .star{position:absolute;right:-3px;top:-3px;width:18px;height:18px;border-radius:9px;background:#f5b301;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--card2)}
 .mbtns{display:flex;gap:8px}
+.mtypes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mtype{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:8px;border-radius:16px;border:2px solid var(--line);background:var(--card);text-align:left}
+.mtype.on{border-color:var(--fill)}
+.mtype .sw{display:block;width:100%;height:64px;border-radius:10px;margin-bottom:4px}
+.li3d{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card);width:100%}
+.tg{width:46px;height:28px;border-radius:14px;background:var(--track);position:relative;flex-shrink:0;transition:background .2s}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:11px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.tg.on{background:var(--fill)}.tg.on::after{transform:translateX(18px)}
 .sel{white-space:nowrap;flex-shrink:0}
 .sbar{flex:1;min-width:0;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--card2);display:flex;align-items:center;gap:8px;padding:0 16px;color:var(--muted);font-size:14px;white-space:nowrap;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .mtop .mchips{flex:none}
@@ -173,7 +181,7 @@ const HAS_TOKEN = /^pk\./.test(MAPBOX_TOKEN) && !MAPBOX_TOKEN.includes('REPLACE'
 const FIREBASE_CONFIG = /*FIREBASE_CONFIG*/null;
 
 const KEY = 'karga-v1', OSM_KEY = 'karga-osm';
-const DEF = () => ({name:'', theme:'auto', dir:'google', f:[], open:false, fuel:'unleaded', sort:'near', mine:[], fav:[], tips:{}, last:null});
+const DEF = () => ({name:'', theme:'auto', dir:'google', f:[], open:false, fuel:'unleaded', sort:'near', mine:[], fav:[], tips:{}, last:null, mapType:'simple', map3d:false});
 // Keys match api/_norm.js. c = pin color, g = glyph color on top of it. Ordered by how common they are.
 const BRANDS = [
   {k:'petron', n:'Petron', c:'#1f4fa8', g:'#fff'}, {k:'shell', n:'Shell', c:'#f6c000', g:'#c4161c'},
@@ -197,6 +205,7 @@ const P = {
   fuel:'<path d="M3 22h12M4 9h10M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 4 0V9.8a2 2 0 0 0-.6-1.4L18 5"/>',
   pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
   refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  layers:'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
   edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
   move:'<path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>',
@@ -230,7 +239,19 @@ function applyTheme(t){
 }
 const darkMQ = matchMedia('(prefers-color-scheme: dark)');
 const isDark = () => S.theme === 'dark' || (S.theme === 'auto' && darkMQ.matches);
-const styleUrl = () => isDark() ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
+// Map styles people can pick from the layers button. Simple follows Day/Night; Streets and Satellite
+// (Mapbox Standard) switch to their night lighting instead. Terrain has no night version.
+const MAP_TYPES = [
+  {k:'simple', n:'Simple', d:'Quiet, so stations stand out', bg:'linear-gradient(135deg,#f3f3f1 0 55%,#e2e2df 55% 60%,#f3f3f1 60%)'},
+  {k:'streets', n:'Streets', d:'Colorful roads and places', bg:'linear-gradient(135deg,#e8eef3 0 40%,#f7d47a 40% 46%,#e8eef3 46% 70%,#bfe3b4 70%)'},
+  {k:'satellite', n:'Satellite', d:'Photos from above', bg:'linear-gradient(135deg,#2f4a2c,#55704a 45%,#8a8f7a 70%,#3d5b6e)'},
+  {k:'terrain', n:'Terrain', d:'Green parks, hills, mountains', bg:'linear-gradient(135deg,#cfe6c0,#a8d08d 50%,#e9e3cf 75%,#9cc7e0)'},
+];
+const mapType = () => MAP_TYPES.some(t => t.k === S.mapType) ? S.mapType : 'simple';
+const isStd = () => mapType() === 'streets' || mapType() === 'satellite';
+const styleUrl = () => ({
+  streets:'mapbox://styles/mapbox/standard', satellite:'mapbox://styles/mapbox/standard-satellite', terrain:'mapbox://styles/mapbox/outdoors-v12',
+}[mapType()] || (isDark() ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11'));
 const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 function restyleMap(){ if(map) map.setStyle(styleUrl(), {diff:false}); }
 darkMQ.addEventListener('change', () => { if(S.theme === 'auto') restyleMap(); });
@@ -465,7 +486,7 @@ function initMap(){
   if(!window.mapboxgl){ el.innerHTML = mapMsg("The map couldn't load", 'Check your internet connection, then open Karga again.'); return; }
   mapboxgl.accessToken = MAPBOX_TOKEN;
   const c = pos ? [pos.lon, pos.lat] : S.last ? [S.last[1], S.last[0]] : [120.9842, 14.5995];
-  map = new mapboxgl.Map({container:el, style:styleUrl(), center:c, zoom:(pos || S.last) ? 13.5 : 11.5, attributionControl:false, dragRotate:false, pitchWithRotate:false});
+  map = new mapboxgl.Map({container:el, style:styleUrl(), center:c, zoom:(pos || S.last) ? 13.5 : 11.5, pitch:S.map3d ? 60 : 0, attributionControl:false, dragRotate:false, pitchWithRotate:false});
   map.touchZoomRotate.disableRotation();
   map.addControl(new mapboxgl.AttributionControl({compact:true}), 'bottom-right');
   map.on('style.load', setupLayers);
@@ -510,7 +531,7 @@ function setupLayers(){
   map.addLayer({id:'st-pt', type:'symbol', source:'st', filter:['!', ['has', 'point_count']], layout:{'icon-image':pinName, 'icon-anchor':'bottom', 'icon-allow-overlap':true, 'icon-ignore-placement':true, 'symbol-sort-key':['case', ['get', 'fav'], 2, ['get', 'mine'], 1, 0]}, paint:{'icon-opacity':['case', ['get', 'closed'], 0.35, 1]}});
   map.addLayer({id:'me-halo', type:'circle', source:'me', paint:{'circle-radius':18, 'circle-color':ink, 'circle-opacity':.12}});
   map.addLayer({id:'me-dot', type:'circle', source:'me', paint:{'circle-radius':7, 'circle-color':ink, 'circle-stroke-width':3, 'circle-stroke-color':bg}});
-  updateMe(); setSel();
+  updateMe(); setSel(); styleExtras(); apply3d(false);
   if(!handlersOn){
     handlersOn = true;
     map.on('click', 'st-pt', e => { if(!placing) openStation(e.features[0].properties.id); });
@@ -527,6 +548,54 @@ function setupLayers(){
     });
   }
   loadArea();
+}
+// Streets and Satellite draw their own gas stations and shops; those are hidden so only Karga's pins show.
+function styleExtras(){
+  if(!isStd()) return;
+  try{
+    map.setConfigProperty('basemap', 'lightPreset', isDark() ? 'night' : 'day');
+    map.setConfigProperty('basemap', 'showPointOfInterestLabels', false);
+  }catch(e){}
+}
+// 3D: tilts the map, raises hills and mountains, and shows buildings in 3D when zoomed in.
+// Two fingers (or right-drag on a computer) then rotate and tilt; turning it off faces north again.
+let compass = null;
+function apply3d(move){
+  const on = S.map3d;
+  if(on){
+    if(!map.getSource('dem')) map.addSource('dem', {type:'raster-dem', url:'mapbox://mapbox.mapbox-terrain-dem-v1', tileSize:512, maxzoom:14});
+    map.setTerrain({source:'dem', exaggeration:1.3});
+    // Simple and Terrain have flat buildings; Streets and Satellite draw their own 3D ones.
+    if(!isStd() && map.getSource('composite') && !map.getLayer('bld3d')) map.addLayer({id:'bld3d', type:'fill-extrusion', source:'composite', 'source-layer':'building', filter:['==', ['get', 'extrude'], 'true'], minzoom:14,
+      paint:{'fill-extrusion-color':isDark() ? '#3a3a3c' : '#dcdcd8', 'fill-extrusion-height':['get', 'height'], 'fill-extrusion-base':['get', 'min_height'], 'fill-extrusion-opacity':.8}}, 'sel-ring');
+    map.dragRotate.enable(); map.touchZoomRotate.enableRotation();
+    if(!compass){ compass = new mapboxgl.NavigationControl({showZoom:false, visualizePitch:true}); map.addControl(compass, 'bottom-right'); }
+  } else {
+    map.setTerrain(null);
+    if(map.getLayer('bld3d')) map.removeLayer('bld3d');
+    map.dragRotate.disable(); map.touchZoomRotate.disableRotation();
+    if(compass){ map.removeControl(compass); compass = null; }
+  }
+  if(isStd()) try{ map.setConfigProperty('basemap', 'show3dObjects', on); }catch(e){}
+  if(move) map.easeTo(on ? {pitch:60, zoom:Math.max(map.getZoom(), 15), duration:900} : {pitch:0, bearing:0, duration:700});
+}
+function openMapStyle(){
+  openSheet(`${sheetHead('Map style')}
+    <div class="mtypes" role="radiogroup" aria-label="Map style">${MAP_TYPES.map(t => `<button role="radio" aria-checked="${mapType() === t.k}" class="mtype${mapType() === t.k ? ' on' : ''}" data-act="maptype-${t.k}">
+      <span class="sw" style="background:${t.bg}"></span><span class="t15">${t.n}</span><span class="tiny">${t.d}</span></button>`).join('')}</div>
+    <button class="li3d" role="switch" aria-checked="${S.map3d}" data-act="map-3d"><span>${I('layers', 20)}</span>
+      <span style="flex:1;text-align:left"><span class="t15" style="display:block">3D view</span><span class="tiny">Tilted map with hills and 3D buildings. Use two fingers to turn and tilt.</span></span>
+      <span class="tg${S.map3d ? ' on' : ''}"></span></button>`);
+}
+function setMapType(k){
+  if(k === mapType()) return;
+  S.mapType = k; persist(); restyleMap();
+  const r = $('scrim'); if(r) r.querySelectorAll('.mtype').forEach(b => { const on = b.dataset.act === 'maptype-' + k; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+}
+function toggle3d(){
+  S.map3d = !S.map3d; persist();
+  if(map && map.isStyleLoaded()) apply3d(true);
+  const b = document.querySelector('[data-act="map-3d"]'); if(b){ b.setAttribute('aria-checked', S.map3d); b.querySelector('.tg').classList.toggle('on', S.map3d); }
 }
 function refreshMap(){ if(map && map.getSource('st')) map.getSource('st').setData(fc(mapStations())); }
 function updateMe(){ if(map && map.getSource('me')) map.getSource('me').setData(fc(pos ? [{id:'me', ...pos}] : [])); }
@@ -1137,6 +1206,7 @@ function renderTop(){
   const t = $('mtop'); if(!t) return;
   t.innerHTML = `<div class="row"><button class="sbar" data-act="search">${I('search', 18)}Search a city or town</button>
     <div class="mbtns"><button class="rb${loading ? ' spin' : ''}" data-act="refresh" aria-label="Load stations near me">${I('refresh')}</button>
+    <button class="rb" data-act="map-style" aria-label="Map style and 3D">${I('layers')}</button>
     <button class="rb" data-act="locate" aria-label="Show my location">${I('locate')}</button></div></div>
     <div class="mchips" role="group" aria-label="Filters">${chipsHTML()}</div>
     ${TOWN ? `<div>${townChip()}</div>` : ''}
@@ -1263,7 +1333,7 @@ function settingsHTML(){
       <div class="li"><span>Stations you added</span><span style="font-weight:600">${S.mine.length}</span></div>
       <div class="li"><span>Stations saved on this device</span><span style="font-weight:600">${OSM.size}</span></div>
     </div>
-    <p class="tiny" style="margin:10px 4px 2px">Station data comes from OpenStreetMap and stays on this device once loaded. Tap the refresh button on the map to load stations where you are now.</p>
+    <p class="tiny" style="margin:10px 4px 2px">Station data comes from OpenStreetMap and is saved on this device, refreshing about once a week. Tap the refresh button on the map to load stations where you are now.</p>
   </div>
   <div class="card" style="padding:12px">
     ${head('sun', 'Appearance')}
@@ -1328,6 +1398,7 @@ document.addEventListener('click', e => {
   }
   if(ds.themeSet){ S.theme = ds.themeSet; persist(); applyTheme(S.theme); restyleMap(); render(); return; }
   if(ds.dirSet){ S.dir = ds.dirSet; persist(); render(); return; }
+  if(ds.act && ds.act.startsWith('maptype-')) return setMapType(ds.act.slice(8));
   switch(ds.act){
     case 'start': return getStarted();
     case 'add': return startPlace();
@@ -1344,6 +1415,8 @@ document.addEventListener('click', e => {
     case 'review-refresh': REV.list = null; return render();
     case 'signout': return signOut();
     case 'refresh': return refreshHere();
+    case 'map-style': return openMapStyle();
+    case 'map-3d': return toggle3d();
     case 'search': return openSearch();
     case 'town-clear': return clearTown();
     case 'open-toggle':

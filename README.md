@@ -28,6 +28,10 @@ It downloads the country in 54 tiles and retries tiles that fail, saving only wh
 
 Search only suggests cities and towns, from `api/towns.js` (which reads `api/_towns.js`). It ignores accents and dots (`las pinas` finds Las Piñas), knows the usual short forms (`Sta.`, `Sto.`, `Gen.`, `QC`, `CDO`, `GenSan`), and a province name (`Laguna`) lists that province's towns. `scripts/fetch-stations.mjs` builds that list from OpenStreetMap's `place=city|town` points with their province, and gives every station a town (`t`): the town its address names, or else the nearest town center within 30 km. OpenStreetMap's town boundaries are too incomplete in the Philippines to use directly. Picking a town turns on a town filter, so the map and the Nearby list show only that town's stations (`/api/stations?town=…`) until its chip's ✕ is tapped.
 
+## Map style and 3D
+
+The layers button on the map picks the map style: Simple (the default, follows Day/Night), Streets and Satellite (Mapbox Standard, with their own night lighting), or Terrain (green parks and hills). The 3D view switch tilts the map, raises hills and mountains, and shows 3D buildings when zoomed in; two fingers then turn and tilt the map. Both choices are saved on the phone. Switching styles doesn't count as a new Mapbox map load.
+
 ## Opening hours
 
 Stations carry OpenStreetMap's `opening_hours` when it's listed. The app shows "Open · closes 10 PM" style badges and has an "Open now" filter. Many stations don't list hours, so that filter only shows stations known to be open.
